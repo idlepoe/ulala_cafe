@@ -6,9 +6,14 @@ const db = admin.firestore();
 // 환경변수 설정
 const config = {
   youtube: {
-    apiKey: process.env.YOUTUBE_API_KEY || 'AIzaSyAaqL6l2BNLbwDZ8aCh_Tr8MYLdXIsRdAI',
+    apiKey: process.env.YOUTUBE_API_KEY,
   },
 };
+
+// API 키 검증
+if (!config.youtube.apiKey) {
+  throw new Error('YouTube API key is not set in environment variables');
+}
 
 // YouTube API 응답 구조
 interface YouTubeSearchResponse {

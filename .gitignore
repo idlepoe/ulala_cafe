@@ -29,3 +29,7 @@ doc/api/
 .flutter-plugins-dependencies
 /lib/firebase_options.dart
 /android/app/google-services.json
+
+# env files
+.env
+functions/.env
