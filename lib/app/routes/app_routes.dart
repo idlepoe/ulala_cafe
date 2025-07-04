@@ -3,10 +3,19 @@ part of 'app_pages.dart';
 
 abstract class Routes {
   Routes._();
-  static const HOME = _Paths.HOME;
+  static const HOME = '/home';
+  static const SPLASH = '/splash';
+  static const MAIN = '/main';
+  static const TAB_HOME = '/tab-home';
+  static const TAB_SEARCH = '/tab-search';
+  static const TAB_LIBRARY = '/tab-library';
+  static const TAB_CAFE = '/tab-cafe';
+  static const PLAY_LIST = '/play-list';
 }
 
 abstract class _Paths {
   _Paths._();
-  static const HOME = '/home';
+  static const SPLASH = '/splash';
+  static const MAIN = '/main';
+  static const PLAY_LIST = '/play-list';
 }
