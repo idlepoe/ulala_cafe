@@ -26,11 +26,6 @@ class TabHomeView extends GetView<TabHomeController> {
             }
             return _buildLastPlaylistCard();
           }),
-
-          SizedBox(height: AppSizes.marginL),
-
-          // 환영 메시지
-          _buildWelcomeCard(),
         ],
       ),
     );

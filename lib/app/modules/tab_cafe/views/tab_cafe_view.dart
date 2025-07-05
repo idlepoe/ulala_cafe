@@ -83,10 +83,13 @@ class TabCafeView extends GetView<TabCafeController> {
           ),
           SizedBox(height: AppSizes.marginL),
 
-          // 카페 설명 카드
+          // 카페 설명 카드 (얇게 표시)
           Container(
             width: double.infinity,
-            padding: EdgeInsets.all(AppSizes.paddingL),
+            padding: EdgeInsets.symmetric(
+              horizontal: AppSizes.paddingL,
+              vertical: AppSizes.paddingM, // 세로 패딩 줄임
+            ),
             decoration: BoxDecoration(
               color: AppColors.surface,
               borderRadius: BorderRadius.circular(AppSizes.radiusL),
@@ -98,57 +101,61 @@ class TabCafeView extends GetView<TabCafeController> {
                 ),
               ],
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.coffee,
-                      color: AppColors.primary,
-                      size: AppSizes.iconL,
-                    ),
-                    SizedBox(width: AppSizes.marginM),
-                    Text('음악 카페', style: AppTextStyles.h3),
-                    const Spacer(),
-                    // 활성 사용자 수
-                    Obx(
-                      () => Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: AppSizes.paddingS,
-                          vertical: AppSizes.paddingXS,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(AppSizes.radiusM),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.person,
-                              size: 16,
-                              color: AppColors.primary,
-                            ),
-                            SizedBox(width: 4),
-                            Text(
-                              '${controller.activeUsers}',
-                              style: AppTextStyles.body2.copyWith(
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
+                Icon(
+                  Icons.coffee,
+                  color: AppColors.primary,
+                  size: AppSizes.iconM, // 아이콘 크기 줄임
+                ),
+                SizedBox(width: AppSizes.marginM),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('음악 카페', style: AppTextStyles.h4), // 제목 크기 줄임
+                      SizedBox(height: 2),
+                      Text(
+                        '다른 사람과 음악과 이야기를 나누는 공간입니다.',
+                        style: AppTextStyles.body2.copyWith(
+                          // 설명 크기 줄임
+                          color: AppColors.textSecondary,
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-                SizedBox(height: AppSizes.marginM),
-                Text(
-                  '다른 사람과 음악과 이야기를 나누는 공간입니다.',
-                  style: AppTextStyles.body1.copyWith(
-                    color: AppColors.textSecondary,
+                // 활성 사용자 수
+                Obx(
+                  () => Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppSizes.paddingS,
+                      vertical: AppSizes.paddingXS,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(AppSizes.radiusM),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.person,
+                          size: 14, // 아이콘 크기 줄임
+                          color: AppColors.primary,
+                        ),
+                        SizedBox(width: 4),
+                        Text(
+                          '${controller.activeUsers}',
+                          style: AppTextStyles.caption.copyWith(
+                            // 텍스트 크기 줄임
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -188,9 +195,19 @@ class TabCafeView extends GetView<TabCafeController> {
 
         return ListView.builder(
           controller: controller.scrollController,
-          itemCount: controller.messages.length,
+          reverse: true, // 리스트를 역순으로 표시하여 하단부터 시작
+          itemCount:
+              controller.messages.length + (controller.hasMoreMessages ? 1 : 0),
           itemBuilder: (context, index) {
-            final message = controller.messages[index];
+            // 더 보기 버튼 (역순이므로 맨 마지막에 표시)
+            if (index == controller.messages.length &&
+                controller.hasMoreMessages) {
+              return _buildLoadMoreButton();
+            }
+
+            // 메시지 인덱스 조정 (역순이므로 뒤에서부터)
+            final messageIndex = controller.messages.length - 1 - index;
+            final message = controller.messages[messageIndex];
             final isMyMessage = controller.isMyMessage(message);
 
             return _buildMessageBubble(message, isMyMessage);
@@ -330,9 +347,50 @@ class TabCafeView extends GetView<TabCafeController> {
     );
   }
 
+  Widget _buildLoadMoreButton() {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: AppSizes.paddingM,
+        vertical: AppSizes.paddingS,
+      ),
+      margin: EdgeInsets.only(bottom: AppSizes.marginM),
+      child: Obx(() {
+        if (controller.isLoadingMore) {
+          return const Center(
+            child: CircularProgressIndicator(color: AppColors.primary),
+          );
+        }
+
+        return Center(
+          child: ElevatedButton.icon(
+            onPressed: () => controller.loadMoreMessages(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.surface,
+              foregroundColor: AppColors.primary,
+              elevation: 2,
+              padding: EdgeInsets.symmetric(
+                horizontal: AppSizes.paddingL,
+                vertical: AppSizes.paddingS,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppSizes.radiusM),
+                side: const BorderSide(color: AppColors.primary),
+              ),
+            ),
+            icon: const Icon(Icons.keyboard_arrow_up, size: 20),
+            label: const Text('이전 메시지 더 보기', style: TextStyle(fontSize: 14)),
+          ),
+        );
+      }),
+    );
+  }
+
   Widget _buildMessageInput() {
     return Container(
-      padding: EdgeInsets.all(AppSizes.paddingL),
+      padding: EdgeInsets.symmetric(
+        horizontal: AppSizes.paddingL,
+        vertical: AppSizes.paddingM, // 세로 패딩 줄임
+      ),
       decoration: BoxDecoration(
         color: AppColors.surface,
         border: Border(top: BorderSide(color: AppColors.border, width: 1)),
@@ -344,20 +402,19 @@ class TabCafeView extends GetView<TabCafeController> {
             GestureDetector(
               onTap: () => controller.showMusicAttachModal(),
               child: Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(6), // 패딩 줄임
                 decoration: BoxDecoration(
                   color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(18), // 크기 약간 줄임
                 ),
                 child: const Icon(
                   Icons.music_note,
                   color: AppColors.surface,
-                  size: 20,
+                  size: 18, // 아이콘 크기 줄임
                 ),
               ),
             ),
-            const SizedBox(width: 12),
-
+            const SizedBox(width: 10), // 간격 줄임
             // 텍스트 입력 필드
             Expanded(
               child: TextField(
@@ -367,40 +424,41 @@ class TabCafeView extends GetView<TabCafeController> {
                   hintText: '메시지를 입력하세요...',
                   hintStyle: TextStyle(color: AppColors.textSecondary),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(18),
+                    ), // 라운드 줄임
                     borderSide: BorderSide(color: AppColors.divider),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                    borderRadius: BorderRadius.all(Radius.circular(18)),
                     borderSide: BorderSide(color: AppColors.divider),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                    borderRadius: BorderRadius.all(Radius.circular(18)),
                     borderSide: BorderSide(color: AppColors.primary),
                   ),
                   contentPadding: EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
+                    horizontal: 14, // 좌우 패딩 줄임
+                    vertical: 10, // 상하 패딩 줄임
                   ),
                 ),
                 onSubmitted: (_) => controller.sendTextMessage(),
               ),
             ),
-            const SizedBox(width: 8),
-
+            const SizedBox(width: 6), // 간격 줄임
             // 전송 버튼
             GestureDetector(
               onTap: () => controller.sendTextMessage(),
               child: Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(8), // 패딩 줄임
                 decoration: BoxDecoration(
                   color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(18), // 크기 약간 줄임
                 ),
                 child: const Icon(
                   Icons.send,
                   color: AppColors.surface,
-                  size: 20,
+                  size: 18, // 아이콘 크기 줄임
                 ),
               ),
             ),

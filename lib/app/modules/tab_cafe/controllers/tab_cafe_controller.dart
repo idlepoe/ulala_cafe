@@ -29,7 +29,7 @@ class TabCafeController extends GetxController {
       user.value = firebaseUser;
     });
 
-    // 새 메시지가 올 때마다 스크롤을 맨 아래로
+    // 새 메시지가 올 때마다 스크롤을 맨 아래로 (reverse 모드에서는 맨 위로)
     _chatProvider.messages.listen((_) {
       _scrollToBottom();
     });
@@ -65,6 +65,12 @@ class TabCafeController extends GetxController {
 
   // 활성 사용자 수
   int get activeUsers => _chatProvider.activeUsers.value;
+
+  // 더 많은 메시지가 있는지 확인
+  bool get hasMoreMessages => _chatProvider.hasMoreMessages.value;
+
+  // 더 많은 메시지 로딩 중인지 확인
+  bool get isLoadingMore => _chatProvider.isLoadingMore.value;
 
   // 프로필 수정 모달 표시
   void showProfileEditModal() {
@@ -109,12 +115,14 @@ class TabCafeController extends GetxController {
     messageController.clear();
   }
 
-  // 스크롤을 맨 아래로
+  // 스크롤을 맨 아래로 (reverse 모드에서는 맨 위로)
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (scrollController.hasClients) {
         scrollController.animateTo(
-          scrollController.position.maxScrollExtent,
+          scrollController
+              .position
+              .minScrollExtent, // reverse 모드에서는 minScrollExtent가 하단
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeOut,
         );

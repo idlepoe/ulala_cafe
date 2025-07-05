@@ -15,6 +15,9 @@ class ChatProvider extends GetxService {
 
   final messages = <ChatMessage>[].obs;
   final activeUsers = 0.obs;
+  final hasMoreMessages = true.obs;
+  final isLoadingMore = false.obs;
+  static const int _messagesPerPage = 100;
 
   String get _cafeCollectionPath => 'cafe_chat';
   String get _activeUsersPath => 'cafe/active_users';
@@ -36,8 +39,8 @@ class ChatProvider extends GetxService {
   void _listenToMessages() {
     _firestore
         .collection(_cafeCollectionPath)
-        .orderBy('timestamp', descending: false)
-        .limit(100) // 최근 100개 메시지만
+        .orderBy('timestamp', descending: true)
+        .limit(_messagesPerPage) // 최근 100개 메시지만
         .snapshots()
         .listen((snapshot) {
           final List<ChatMessage> loadedMessages = [];
@@ -53,7 +56,12 @@ class ChatProvider extends GetxService {
             }
           }
 
+          // 시간순으로 정렬 (최신 메시지가 하단에 오도록)
+          loadedMessages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
           messages.value = loadedMessages;
+
+          // 메시지가 100개 이상일 때만 더 보기 버튼 표시
+          hasMoreMessages.value = loadedMessages.length >= _messagesPerPage;
         });
   }
 
@@ -192,14 +200,19 @@ class ChatProvider extends GetxService {
   /// 이전 메시지 더 불러오기
   Future<void> loadMoreMessages() async {
     try {
-      if (messages.isEmpty) return;
+      if (messages.isEmpty || !hasMoreMessages.value || isLoadingMore.value) {
+        return;
+      }
 
-      final lastMessage = messages.first;
+      isLoadingMore.value = true;
+      logger.d('더 많은 메시지 로드 시작...');
+
+      final earliestMessage = messages.first;
       final query = await _firestore
           .collection(_cafeCollectionPath)
           .orderBy('timestamp', descending: true)
-          .startAfter([lastMessage.timestamp])
-          .limit(20)
+          .startAfter([earliestMessage.timestamp])
+          .limit(_messagesPerPage)
           .get();
 
       final List<ChatMessage> olderMessages = [];
@@ -215,10 +228,22 @@ class ChatProvider extends GetxService {
         }
       }
 
-      // 기존 메시지 앞에 추가
-      messages.insertAll(0, olderMessages.reversed);
+      logger.d('로드된 추가 메시지: ${olderMessages.length}개');
+
+      if (olderMessages.isNotEmpty) {
+        // 시간순으로 정렬 후 기존 메시지 앞에 추가
+        olderMessages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+        messages.insertAll(0, olderMessages);
+
+        // 더 많은 메시지가 있는지 확인
+        hasMoreMessages.value = olderMessages.length >= _messagesPerPage;
+      } else {
+        hasMoreMessages.value = false;
+      }
     } catch (e) {
       logger.e('이전 메시지 로드 실패: $e');
+    } finally {
+      isLoadingMore.value = false;
     }
   }
 
