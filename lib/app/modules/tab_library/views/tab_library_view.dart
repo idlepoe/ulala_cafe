@@ -6,11 +6,48 @@ import '../../../data/constants/app_colors.dart';
 import '../../../data/constants/app_sizes.dart';
 import '../../../data/constants/app_text_styles.dart';
 import '../../../routes/app_pages.dart';
+import '../../play_list/views/play_list_view.dart';
 
 class TabLibraryView extends GetView<TabLibraryController> {
-  const TabLibraryView({super.key});
+  const TabLibraryView({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: Stack(
+        children: [
+          // 기본 라이브러리 화면 (기존 디자인 유지)
+          _buildLibraryContent(),
+          // 플레이리스트 화면 오버레이
+          Obx(() {
+            if (controller.showPlaylistView.value) {
+              return Container(
+                color: AppColors.background,
+                child: Stack(
+                  children: [
+                    const PlayListView(),
+                    // 뒤로 가기 버튼
+                    Positioned(
+                      top: MediaQuery.of(context).padding.top + 10,
+                      left: 10,
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_back, color: Colors.white),
+                        onPressed: controller.closePlaylist,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+            return const SizedBox.shrink();
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLibraryContent() {
     return Container(
       color: AppColors.background,
       padding: EdgeInsets.symmetric(horizontal: AppSizes.paddingL),
@@ -77,12 +114,7 @@ class TabLibraryView extends GetView<TabLibraryController> {
                       ),
                       clipBehavior: Clip.antiAlias,
                       child: InkWell(
-                        onTap: () {
-                          Get.toNamed(
-                            Routes.PLAY_LIST,
-                            arguments: {'playlistId': playlist.id},
-                          );
-                        },
+                        onTap: () => controller.openPlaylist(playlist.id),
                         child: Row(
                           children: [
                             SizedBox(

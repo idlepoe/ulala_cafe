@@ -55,6 +55,11 @@ class AppTextStyles {
     height: 1.5,
   );
 
+  static const TextStyle body = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w400,
+  );
+
   // 캡션 스타일
   static const TextStyle caption1 = TextStyle(
     fontSize: 12,
@@ -68,6 +73,11 @@ class AppTextStyles {
     fontWeight: FontWeight.w400,
     color: AppColors.textSecondary,
     height: 1.4,
+  );
+
+  static const TextStyle caption = TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.w400,
   );
 
   // 버튼 스타일

@@ -37,4 +37,6 @@ class AppColors {
   static const Color bottomNavBackground = Color(0xFFFFFFFF);
   static const Color bottomNavSelected = Color(0xFF0064FF);
   static const Color bottomNavUnselected = Color(0xFF8B95A1);
+
+  static const Color inactive = Color(0xFF9E9E9E);
 }

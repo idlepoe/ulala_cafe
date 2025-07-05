@@ -3,10 +3,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../data/utils/logger.dart';
 import '../../../data/models/youtube_track_model.dart';
+import '../../play_list/controllers/play_list_controller.dart';
 
 class TabLibraryController extends GetxController {
   final playlists = <PlaylistData>[].obs;
   final isLoading = true.obs;
+  final showPlaylistView = false.obs;
+  final selectedPlaylistId = ''.obs;
 
   @override
   void onInit() {
@@ -15,6 +18,7 @@ class TabLibraryController extends GetxController {
   }
 
   Future<void> loadPlaylists() async {
+    logger.d('loadPlaylists');
     try {
       isLoading.value = true;
       final user = FirebaseAuth.instance.currentUser;
@@ -60,6 +64,32 @@ class TabLibraryController extends GetxController {
       logger.e('플레이리스트 로드 실패: $e');
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  void openPlaylist(String playlistId) {
+    logger.d('openPlaylist: $playlistId');
+    selectedPlaylistId.value = playlistId;
+
+    // PlayListController가 없으면 생성
+    if (!Get.isRegistered<PlayListController>()) {
+      Get.put(PlayListController());
+    }
+
+    // PlayListController에 플레이리스트 ID 전달하고 로드
+    final playListController = Get.find<PlayListController>();
+    playListController.loadPlaylistById(playlistId);
+
+    showPlaylistView.value = true;
+  }
+
+  void closePlaylist() {
+    showPlaylistView.value = false;
+    selectedPlaylistId.value = '';
+
+    // PlayListController 제거
+    if (Get.isRegistered<PlayListController>()) {
+      Get.delete<PlayListController>();
     }
   }
 }

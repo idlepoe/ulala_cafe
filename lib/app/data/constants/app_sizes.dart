@@ -49,4 +49,7 @@ class AppSizes {
   // 그림자
   static const double shadowBlurRadius = 8.0;
   static const double shadowOffsetY = 2.0;
+
+  static const double spacing = 16.0;
+  static const double spacingXS = 4.0;
 }
