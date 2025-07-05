@@ -88,6 +88,41 @@ class ChatProvider extends GetxService {
     }
   }
 
+  /// 음악 메시지 전송
+  Future<bool> sendMusicMessage(ChatMessage message) async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) {
+        logger.w('로그인된 사용자가 없습니다.');
+        return false;
+      }
+
+      // 수동으로 JSON 직렬화 처리
+      final messageData = <String, dynamic>{
+        'id': message.id,
+        'uid': message.uid,
+        'displayName': message.displayName,
+        'photoUrl': message.photoUrl,
+        'message': message.message,
+        'timestamp': Timestamp.fromDate(message.timestamp),
+        'type': message.type,
+      };
+
+      // youtubeTrack이 있는 경우 수동으로 추가
+      if (message.youtubeTrack != null) {
+        messageData['youtubeTrack'] = message.youtubeTrack!.toJson();
+      }
+
+      await _firestore.collection(_cafeCollectionPath).add(messageData);
+
+      logger.d('음악 메시지 전송 완료: ${message.message}');
+      return true;
+    } catch (e) {
+      logger.e('음악 메시지 전송 실패: $e');
+      return false;
+    }
+  }
+
   /// 사용자 활성 상태 추적
   void _trackUserPresence() {
     final user = _auth.currentUser;
@@ -190,24 +225,99 @@ class ChatProvider extends GetxService {
   // 사용자의 모든 플레이리스트에서 유튜브 트랙을 가져오는 메서드
   Future<List<YoutubeTrack>> getAllUserTracks() async {
     try {
+      logger.d('getAllUserTracks 시작');
       final user = FirebaseAuth.instance.currentUser;
-      if (user == null) return [];
+      if (user == null) {
+        logger.w('사용자가 로그인되지 않음');
+        return [];
+      }
+
+      logger.d('사용자 UID: ${user.uid}');
 
       final playlistsSnapshot = await FirebaseFirestore.instance
           .collection('playlists')
           .where('uid', isEqualTo: user.uid)
           .get();
 
+      logger.d('플레이리스트 조회 완료: ${playlistsSnapshot.docs.length}개');
+
       List<YoutubeTrack> allTracks = [];
 
       for (var playlistDoc in playlistsSnapshot.docs) {
-        final playlist = Playlist.fromJson(playlistDoc.data());
-        allTracks.addAll(playlist.tracks);
+        logger.d('플레이리스트 처리 중: ${playlistDoc.id}');
+        final data = playlistDoc.data();
+        logger.d('플레이리스트 raw 데이터: ${data.toString()}');
+
+        // tracks 필드 상세 확인
+        if (data.containsKey('tracks')) {
+          final tracksData = data['tracks'];
+          logger.d('tracks 필드 타입: ${tracksData.runtimeType}');
+          logger.d(
+            'tracks 필드 길이: ${tracksData is List ? tracksData.length : 'N/A'}',
+          );
+          if (tracksData is List && tracksData.isNotEmpty) {
+            logger.d('첫 번째 트랙 데이터: ${tracksData[0]}');
+          }
+        } else {
+          logger.w('플레이리스트에 tracks 필드가 없음: ${playlistDoc.id}');
+        }
+
+        try {
+          // 안전하게 트랙 데이터 파싱
+          final playlistName = data['name'] as String? ?? '알 수 없는 플레이리스트';
+          final tracksData = data['tracks'] as List? ?? [];
+
+          logger.d('플레이리스트 "$playlistName" - 트랙 데이터 수: ${tracksData.length}');
+
+          for (var trackData in tracksData) {
+            try {
+              if (trackData is Map<String, dynamic>) {
+                // 필수 필드들이 모두 있는지 확인하고 안전하게 파싱
+                final videoId = trackData['videoId'] as String? ?? '';
+                final title = trackData['title'] as String? ?? '';
+                final description = trackData['description'] as String? ?? '';
+                final thumbnail = trackData['thumbnail'] as String? ?? '';
+                final channelTitle = trackData['channelTitle'] as String? ?? '';
+                final publishedAt = trackData['publishedAt'] as String? ?? '';
+                final duration = trackData['duration'] as int?;
+
+                // videoId를 id로 사용하고, 필수 필드들이 비어있지 않은 경우에만 트랙 생성
+                if (videoId.isNotEmpty && title.isNotEmpty) {
+                  final track = YoutubeTrack(
+                    id: videoId, // videoId를 id로 사용
+                    videoId: videoId,
+                    title: title,
+                    description: description,
+                    thumbnail: thumbnail,
+                    channelTitle: channelTitle,
+                    publishedAt: publishedAt,
+                    duration: duration,
+                    createdBy: null,
+                  );
+
+                  allTracks.add(track);
+                  logger.d('트랙 추가 성공: $title ($videoId)');
+                } else {
+                  logger.w('필수 필드가 누락된 트랙 스킵: $trackData');
+                }
+              } else {
+                logger.w('올바르지 않은 트랙 데이터 형식: $trackData');
+              }
+            } catch (trackError) {
+              logger.e('개별 트랙 파싱 실패: $trackError');
+              logger.e('문제있는 트랙 데이터: $trackData');
+            }
+          }
+        } catch (e) {
+          logger.e('플레이리스트 파싱 실패: ${playlistDoc.id}, 에러: $e');
+          logger.e('실패한 데이터: $data');
+        }
       }
 
+      logger.d('getAllUserTracks 완료: 총 ${allTracks.length}개 트랙');
       return allTracks;
     } catch (e) {
-      print('Error getting user tracks: $e');
+      logger.e('getAllUserTracks 실패: $e');
       return [];
     }
   }

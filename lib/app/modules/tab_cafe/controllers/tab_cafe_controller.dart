@@ -5,6 +5,7 @@ import '../widgets/profile_edit_modal.dart';
 import '../../../data/providers/chat_provider.dart';
 import '../../../data/models/chat_message_model.dart';
 import '../../../data/utils/snackbar_util.dart';
+import '../../../data/utils/logger.dart';
 import '../../../data/models/youtube_track_model.dart';
 import '../widgets/music_attach_modal.dart';
 
@@ -142,9 +143,11 @@ class TabCafeController extends GetxController {
 
   // 음악 첨부 모달 표시
   void showMusicAttachModal() {
+    logger.d('TabCafeController: 음악 첨부 모달 표시');
     Get.bottomSheet(
       MusicAttachModal(
         onTrackSelected: (track) {
+          logger.d('TabCafeController: 트랙 선택됨 - ${track.title}');
           _sendMusicMessage(track);
         },
       ),
@@ -154,15 +157,43 @@ class TabCafeController extends GetxController {
 
   // 음악 정보가 포함된 메시지 전송
   void _sendMusicMessage(YoutubeTrack track) {
-    final musicMarkup =
-        '''
-🎵 [음악 추천]
-제목: ${track.title}
-채널: ${track.channelTitle}
-링크: https://www.youtube.com/watch?v=${track.videoId}
-${track.description.isNotEmpty ? '\n설명: ${track.description.length > 100 ? track.description.substring(0, 100) + '...' : track.description}' : ''}
-''';
+    logger.d('TabCafeController: 음악 메시지 생성 - ${track.title}');
+    _sendMusicMessageWithTrack(track);
+  }
 
-    sendMessage(musicMarkup);
+  // YoutubeTrack 데이터와 함께 음악 메시지 전송
+  Future<void> _sendMusicMessageWithTrack(YoutubeTrack track) async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) {
+        logger.w('로그인된 사용자가 없습니다.');
+        return;
+      }
+
+      final message = ChatMessage(
+        id: '', // Firestore에서 자동 생성
+        uid: user.uid,
+        displayName: user.displayName?.isNotEmpty == true
+            ? user.displayName!
+            : (user.uid.length >= 5 ? user.uid.substring(0, 5) : user.uid),
+        photoUrl: user.photoURL,
+        message: '🎵 ${track.title}', // 간단한 텍스트
+        timestamp: DateTime.now(),
+        type: 'music',
+        youtubeTrack: track,
+      );
+
+      final success = await _chatProvider.sendMusicMessage(message);
+
+      if (success) {
+        logger.d('TabCafeController: 음악 메시지 전송 완료');
+        _scrollToBottom();
+      } else {
+        SnackbarUtil.showError('음악 메시지 전송에 실패했습니다');
+      }
+    } catch (e) {
+      logger.e('TabCafeController: 음악 메시지 전송 실패 - $e');
+      SnackbarUtil.showError('음악 메시지 전송에 실패했습니다');
+    }
   }
 }

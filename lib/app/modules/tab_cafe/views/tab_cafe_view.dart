@@ -7,6 +7,7 @@ import '../../../data/constants/app_colors.dart';
 import '../../../data/constants/app_sizes.dart';
 import '../../../data/constants/app_text_styles.dart';
 import '../../../data/models/chat_message_model.dart';
+import '../widgets/music_message_widget.dart';
 
 class TabCafeView extends GetView<TabCafeController> {
   const TabCafeView({super.key});
@@ -251,42 +252,7 @@ class TabCafeView extends GetView<TabCafeController> {
                   onLongPress: isMyMessage
                       ? () => _showDeleteDialog(message)
                       : null,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: AppSizes.paddingM,
-                      vertical: AppSizes.paddingS,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isMyMessage
-                          ? AppColors.primary
-                          : AppColors.surface,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(AppSizes.radiusM),
-                        topRight: Radius.circular(AppSizes.radiusM),
-                        bottomLeft: Radius.circular(
-                          isMyMessage ? AppSizes.radiusM : AppSizes.radiusS,
-                        ),
-                        bottomRight: Radius.circular(
-                          isMyMessage ? AppSizes.radiusS : AppSizes.radiusM,
-                        ),
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.shadowLight,
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Text(
-                      message.message,
-                      style: AppTextStyles.body1.copyWith(
-                        color: isMyMessage
-                            ? Colors.white
-                            : AppColors.textPrimary,
-                      ),
-                    ),
-                  ),
+                  child: _buildMessageContent(message, isMyMessage),
                 ),
 
                 // 시간
@@ -316,6 +282,50 @@ class TabCafeView extends GetView<TabCafeController> {
             ),
           ],
         ],
+      ),
+    );
+  }
+
+  Widget _buildMessageContent(ChatMessage message, bool isMyMessage) {
+    // 음악 메시지인 경우
+    if (message.type == 'music' && message.youtubeTrack != null) {
+      return MusicMessageWidget(
+        track: message.youtubeTrack!,
+        isMyMessage: isMyMessage,
+      );
+    }
+
+    // 일반 텍스트 메시지인 경우
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: AppSizes.paddingM,
+        vertical: AppSizes.paddingS,
+      ),
+      decoration: BoxDecoration(
+        color: isMyMessage ? AppColors.primary : AppColors.surface,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(AppSizes.radiusM),
+          topRight: Radius.circular(AppSizes.radiusM),
+          bottomLeft: Radius.circular(
+            isMyMessage ? AppSizes.radiusM : AppSizes.radiusS,
+          ),
+          bottomRight: Radius.circular(
+            isMyMessage ? AppSizes.radiusS : AppSizes.radiusM,
+          ),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadowLight,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Text(
+        message.message,
+        style: AppTextStyles.body1.copyWith(
+          color: isMyMessage ? Colors.white : AppColors.textPrimary,
+        ),
       ),
     );
   }

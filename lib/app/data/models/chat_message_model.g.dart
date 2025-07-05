@@ -14,6 +14,9 @@ _ChatMessage _$ChatMessageFromJson(Map<String, dynamic> json) => _ChatMessage(
       message: json['message'] as String,
       timestamp: const TimestampConverter().fromJson(json['timestamp']),
       type: json['type'] as String? ?? 'text',
+      youtubeTrack: json['youtubeTrack'] == null
+          ? null
+          : YoutubeTrack.fromJson(json['youtubeTrack'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$ChatMessageToJson(_ChatMessage instance) =>
@@ -25,4 +28,5 @@ Map<String, dynamic> _$ChatMessageToJson(_ChatMessage instance) =>
       'message': instance.message,
       'timestamp': const TimestampConverter().toJson(instance.timestamp),
       'type': instance.type,
+      'youtubeTrack': instance.youtubeTrack,
     };

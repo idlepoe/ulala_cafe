@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'youtube_track_model.dart';
 
 part 'chat_message_model.freezed.dart';
 part 'chat_message_model.g.dart';
@@ -14,6 +15,7 @@ abstract class ChatMessage with _$ChatMessage {
     required String message,
     @TimestampConverter() required DateTime timestamp,
     @Default('text') String type, // 'text', 'music'
+    YoutubeTrack? youtubeTrack, // 음악 메시지일 때 사용
   }) = _ChatMessage;
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) =>

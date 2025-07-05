@@ -7,6 +7,7 @@ import '../../../data/models/youtube_track_model.dart';
 import '../../../data/providers/chat_provider.dart';
 import '../../../data/utils/snackbar_util.dart';
 import '../../../data/utils/toss_loading_indicator.dart';
+import '../../../data/utils/logger.dart';
 
 class MusicAttachModal extends StatefulWidget {
   final Function(YoutubeTrack) onTrackSelected;
@@ -29,18 +30,33 @@ class _MusicAttachModalState extends State<MusicAttachModal> {
   @override
   void initState() {
     super.initState();
+    logger.d('MusicAttachModal: initState 호출');
     _loadTracks();
   }
 
   void _loadTracks() async {
     try {
+      logger.d('MusicAttachModal: 트랙 로드 시작');
+      setState(() {
+        _isLoading = true;
+      });
+
       final tracks = await _chatProvider.getAllUserTracks();
+      logger.d('MusicAttachModal: 트랙 로드 완료 - ${tracks.length}개');
+
+      for (var track in tracks) {
+        logger.d('MusicAttachModal: 트랙 - ${track.title} (${track.videoId})');
+      }
+
       setState(() {
         _allTracks = tracks;
         _filteredTracks = tracks;
         _isLoading = false;
       });
+
+      logger.d('MusicAttachModal: UI 업데이트 완료');
     } catch (e) {
+      logger.e('MusicAttachModal: 트랙 로드 실패 - $e');
       setState(() {
         _isLoading = false;
       });
@@ -49,9 +65,13 @@ class _MusicAttachModalState extends State<MusicAttachModal> {
   }
 
   void _filterTracks(String query) {
+    logger.d('MusicAttachModal: 필터링 시작 - 검색어: "$query"');
+    logger.d('MusicAttachModal: 전체 트랙 수: ${_allTracks.length}');
+
     setState(() {
       if (query.isEmpty) {
         _filteredTracks = _allTracks;
+        logger.d('MusicAttachModal: 필터링 해제 - 결과: ${_filteredTracks.length}개');
       } else {
         _filteredTracks = _allTracks
             .where(
@@ -59,12 +79,16 @@ class _MusicAttachModalState extends State<MusicAttachModal> {
                   track.title.toLowerCase().contains(query.toLowerCase()),
             )
             .toList();
+        logger.d('MusicAttachModal: 필터링 완료 - 결과: ${_filteredTracks.length}개');
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    logger.d(
+      'MusicAttachModal: build 호출 - 로딩: $_isLoading, 전체 트랙: ${_allTracks.length}, 필터된 트랙: ${_filteredTracks.length}',
+    );
     return Container(
       height: MediaQuery.of(context).size.height * 0.7,
       decoration: const BoxDecoration(
@@ -156,6 +180,9 @@ class _MusicAttachModalState extends State<MusicAttachModal> {
                     itemCount: _filteredTracks.length,
                     itemBuilder: (context, index) {
                       final track = _filteredTracks[index];
+                      logger.d(
+                        'MusicAttachModal: ListView 아이템 빌드 - 인덱스: $index, 트랙: ${track.title}',
+                      );
                       return _buildTrackItem(track);
                     },
                   ),

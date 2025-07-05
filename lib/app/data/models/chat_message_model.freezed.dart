@@ -22,7 +22,8 @@ mixin _$ChatMessage {
   String get message;
   @TimestampConverter()
   DateTime get timestamp;
-  String get type;
+  String get type; // 'text', 'music'
+  YoutubeTrack? get youtubeTrack;
 
   /// Create a copy of ChatMessage
   /// with the given fields replaced by the non-null parameter values.
@@ -48,17 +49,19 @@ mixin _$ChatMessage {
             (identical(other.message, message) || other.message == message) &&
             (identical(other.timestamp, timestamp) ||
                 other.timestamp == timestamp) &&
-            (identical(other.type, type) || other.type == type));
+            (identical(other.type, type) || other.type == type) &&
+            (identical(other.youtubeTrack, youtubeTrack) ||
+                other.youtubeTrack == youtubeTrack));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, id, uid, displayName, photoUrl, message, timestamp, type);
+  int get hashCode => Object.hash(runtimeType, id, uid, displayName, photoUrl,
+      message, timestamp, type, youtubeTrack);
 
   @override
   String toString() {
-    return 'ChatMessage(id: $id, uid: $uid, displayName: $displayName, photoUrl: $photoUrl, message: $message, timestamp: $timestamp, type: $type)';
+    return 'ChatMessage(id: $id, uid: $uid, displayName: $displayName, photoUrl: $photoUrl, message: $message, timestamp: $timestamp, type: $type, youtubeTrack: $youtubeTrack)';
   }
 }
 
@@ -75,7 +78,10 @@ abstract mixin class $ChatMessageCopyWith<$Res> {
       String? photoUrl,
       String message,
       @TimestampConverter() DateTime timestamp,
-      String type});
+      String type,
+      YoutubeTrack? youtubeTrack});
+
+  $YoutubeTrackCopyWith<$Res>? get youtubeTrack;
 }
 
 /// @nodoc
@@ -97,6 +103,7 @@ class _$ChatMessageCopyWithImpl<$Res> implements $ChatMessageCopyWith<$Res> {
     Object? message = null,
     Object? timestamp = null,
     Object? type = null,
+    Object? youtubeTrack = freezed,
   }) {
     return _then(_self.copyWith(
       id: null == id
@@ -127,7 +134,25 @@ class _$ChatMessageCopyWithImpl<$Res> implements $ChatMessageCopyWith<$Res> {
           ? _self.type
           : type // ignore: cast_nullable_to_non_nullable
               as String,
+      youtubeTrack: freezed == youtubeTrack
+          ? _self.youtubeTrack
+          : youtubeTrack // ignore: cast_nullable_to_non_nullable
+              as YoutubeTrack?,
     ));
+  }
+
+  /// Create a copy of ChatMessage
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $YoutubeTrackCopyWith<$Res>? get youtubeTrack {
+    if (_self.youtubeTrack == null) {
+      return null;
+    }
+
+    return $YoutubeTrackCopyWith<$Res>(_self.youtubeTrack!, (value) {
+      return _then(_self.copyWith(youtubeTrack: value));
+    });
   }
 }
 
@@ -141,7 +166,8 @@ class _ChatMessage implements ChatMessage {
       this.photoUrl,
       required this.message,
       @TimestampConverter() required this.timestamp,
-      this.type = 'text'});
+      this.type = 'text',
+      this.youtubeTrack});
   factory _ChatMessage.fromJson(Map<String, dynamic> json) =>
       _$ChatMessageFromJson(json);
 
@@ -161,6 +187,9 @@ class _ChatMessage implements ChatMessage {
   @override
   @JsonKey()
   final String type;
+// 'text', 'music'
+  @override
+  final YoutubeTrack? youtubeTrack;
 
   /// Create a copy of ChatMessage
   /// with the given fields replaced by the non-null parameter values.
@@ -191,17 +220,19 @@ class _ChatMessage implements ChatMessage {
             (identical(other.message, message) || other.message == message) &&
             (identical(other.timestamp, timestamp) ||
                 other.timestamp == timestamp) &&
-            (identical(other.type, type) || other.type == type));
+            (identical(other.type, type) || other.type == type) &&
+            (identical(other.youtubeTrack, youtubeTrack) ||
+                other.youtubeTrack == youtubeTrack));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, id, uid, displayName, photoUrl, message, timestamp, type);
+  int get hashCode => Object.hash(runtimeType, id, uid, displayName, photoUrl,
+      message, timestamp, type, youtubeTrack);
 
   @override
   String toString() {
-    return 'ChatMessage(id: $id, uid: $uid, displayName: $displayName, photoUrl: $photoUrl, message: $message, timestamp: $timestamp, type: $type)';
+    return 'ChatMessage(id: $id, uid: $uid, displayName: $displayName, photoUrl: $photoUrl, message: $message, timestamp: $timestamp, type: $type, youtubeTrack: $youtubeTrack)';
   }
 }
 
@@ -220,7 +251,11 @@ abstract mixin class _$ChatMessageCopyWith<$Res>
       String? photoUrl,
       String message,
       @TimestampConverter() DateTime timestamp,
-      String type});
+      String type,
+      YoutubeTrack? youtubeTrack});
+
+  @override
+  $YoutubeTrackCopyWith<$Res>? get youtubeTrack;
 }
 
 /// @nodoc
@@ -242,6 +277,7 @@ class __$ChatMessageCopyWithImpl<$Res> implements _$ChatMessageCopyWith<$Res> {
     Object? message = null,
     Object? timestamp = null,
     Object? type = null,
+    Object? youtubeTrack = freezed,
   }) {
     return _then(_ChatMessage(
       id: null == id
@@ -272,7 +308,25 @@ class __$ChatMessageCopyWithImpl<$Res> implements _$ChatMessageCopyWith<$Res> {
           ? _self.type
           : type // ignore: cast_nullable_to_non_nullable
               as String,
+      youtubeTrack: freezed == youtubeTrack
+          ? _self.youtubeTrack
+          : youtubeTrack // ignore: cast_nullable_to_non_nullable
+              as YoutubeTrack?,
     ));
+  }
+
+  /// Create a copy of ChatMessage
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $YoutubeTrackCopyWith<$Res>? get youtubeTrack {
+    if (_self.youtubeTrack == null) {
+      return null;
+    }
+
+    return $YoutubeTrackCopyWith<$Res>(_self.youtubeTrack!, (value) {
+      return _then(_self.copyWith(youtubeTrack: value));
+    });
   }
 }
 
