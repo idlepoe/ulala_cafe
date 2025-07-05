@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import '../models/youtube_track_model.dart';
 import 'dio.dart';
 import 'logger.dart';
+import 'snackbar_util.dart';
 
 class ApiService {
   /// YouTube 검색 (Firebase Functions 활용)
@@ -57,13 +58,13 @@ class ApiService {
           message = responseData['message'];
         }
 
-        Get.snackbar('오류', message);
+        SnackbarUtil.showError(message);
       } else {
-        Get.snackbar('오류', '네트워크 오류 또는 서버에 연결할 수 없습니다.');
+        SnackbarUtil.showError('네트워크 오류 또는 서버에 연결할 수 없습니다.');
       }
     } catch (e) {
       logger.e('YouTube 검색 오류: $e');
-      Get.snackbar('오류', e.toString());
+      SnackbarUtil.showError(e.toString());
     }
 
     return {

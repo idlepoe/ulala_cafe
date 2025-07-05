@@ -7,6 +7,7 @@ import '../../tab_search/controllers/tab_search_controller.dart';
 import '../../tab_library/controllers/tab_library_controller.dart';
 import '../../tab_cafe/controllers/tab_cafe_controller.dart';
 import '../../../data/providers/search_provider.dart';
+import '../../../data/providers/playlist_provider.dart';
 
 class MainBinding extends Bindings {
   @override
@@ -16,6 +17,7 @@ class MainBinding extends Bindings {
 
     // Providers
     Get.lazyPut<SearchProvider>(() => SearchProvider());
+    Get.put<PlaylistProvider>(PlaylistProvider(), permanent: true);
 
     // Tab Controllers
     Get.put<TabHomeController>(TabHomeController());

@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ulala_cafe/app/routes/app_pages.dart';
 import 'package:ulala_cafe/app/data/utils/logger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ulala_cafe/app/data/utils/snackbar_util.dart';
 
 class SplashController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -61,13 +62,9 @@ class SplashController extends GetxController {
   }
 
   void _showAuthError() {
-    Get.snackbar(
-      '인증 오류',
+    SnackbarUtil.showError(
       '로그인에 실패했습니다. 앱을 다시 시작해주세요.',
-      snackPosition: SnackPosition.BOTTOM,
       duration: const Duration(seconds: 5),
-      backgroundColor: const Color(0xFFE74C3C),
-      colorText: Colors.white,
     );
 
     // 5초 후 다시 인증 시도

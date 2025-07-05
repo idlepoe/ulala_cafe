@@ -37,5 +37,11 @@ class MainController extends GetxController {
     }
 
     currentIndex.value = index;
+
+    // 라이브러리 탭이 선택되었을 때 플레이리스트 목록 새로 로드
+    if (index == 2 && Get.isRegistered<TabLibraryController>()) {
+      final libraryController = Get.find<TabLibraryController>();
+      libraryController.loadPlaylists();
+    }
   }
 }

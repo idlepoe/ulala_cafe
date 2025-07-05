@@ -6,6 +6,8 @@ import '../controllers/play_list_controller.dart';
 import '../../../data/constants/app_colors.dart';
 import '../../../data/constants/app_sizes.dart';
 import '../../../data/constants/app_text_styles.dart';
+import '../../../data/utils/toss_loading_indicator.dart';
+import '../../../routes/app_pages.dart';
 
 class PlayListView extends GetView<PlayListController> {
   const PlayListView({Key? key}) : super(key: key);
@@ -15,11 +17,13 @@ class PlayListView extends GetView<PlayListController> {
     return Scaffold(
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+            child: TossLoadingIndicator(size: 40, strokeWidth: 3.0),
+          );
         }
 
         if (controller.tracks.isEmpty) {
-          return const Center(child: Text('플레이리스트가 비어있습니다.'));
+          return _buildEmptyPlaylist();
         }
 
         return CustomScrollView(
@@ -62,14 +66,39 @@ class PlayListView extends GetView<PlayListController> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Obx(
-                            () => Text(
-                              controller.playlistName.value,
-                              style: AppTextStyles.h2.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Obx(
+                                  () => GestureDetector(
+                                    onTap: () =>
+                                        controller.showEditPlaylistModal(),
+                                    child: Text(
+                                      controller.playlistName.value,
+                                      style: AppTextStyles.h2.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
+                              // 삭제 버튼
+                              IconButton(
+                                onPressed: () =>
+                                    controller.showDeletePlaylistDialog(),
+                                icon: Icon(
+                                  Icons.delete_outline,
+                                  color: Colors.white.withOpacity(0.8),
+                                  size: 24,
+                                ),
+                                padding: EdgeInsets.all(8),
+                                constraints: BoxConstraints(
+                                  minWidth: 40,
+                                  minHeight: 40,
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 8),
                           Text(
@@ -193,6 +222,84 @@ class PlayListView extends GetView<PlayListController> {
           ],
         );
       }),
+    );
+  }
+
+  Widget _buildEmptyPlaylist() {
+    return Container(
+      color: AppColors.background,
+      child: CustomScrollView(
+        slivers: [
+          // 상단 앱바
+          SliverAppBar(
+            backgroundColor: AppColors.background,
+            pinned: true,
+            elevation: 0,
+            title: Obx(
+              () => Text(
+                controller.playlistName.value,
+                style: AppTextStyles.h3.copyWith(color: AppColors.textPrimary),
+              ),
+            ),
+          ),
+          // 빈 플레이리스트 메시지
+          SliverFillRemaining(
+            child: Center(
+              child: Padding(
+                padding: EdgeInsets.all(AppSizes.paddingXL),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.music_note,
+                      size: 120,
+                      color: AppColors.textSecondary.withOpacity(0.3),
+                    ),
+                    SizedBox(height: AppSizes.marginL),
+                    Text(
+                      '아직 곡이 없어요',
+                      style: AppTextStyles.h4.copyWith(
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    SizedBox(height: AppSizes.marginS),
+                    Text(
+                      '검색에서 좋아하는 곡을 추가해보세요',
+                      style: AppTextStyles.body2.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: AppSizes.marginXL),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        // 검색 화면으로 이동
+                        Get.toNamed(
+                          Routes.MAIN,
+                          arguments: {'initialIndex': 1},
+                        );
+                      },
+                      icon: const Icon(Icons.search),
+                      label: const Text('곡 찾아보기'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: AppSizes.paddingXL,
+                          vertical: AppSizes.paddingM,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(AppSizes.radiusL),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

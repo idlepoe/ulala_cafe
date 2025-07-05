@@ -1,9 +1,16 @@
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import '../../../data/models/youtube_track_model.dart';
 import '../../../data/utils/logger.dart';
+import '../../../data/utils/snackbar_util.dart';
+import '../../../data/providers/playlist_provider.dart';
+import '../widgets/edit_playlist_modal.dart';
+import '../widgets/delete_playlist_dialog.dart';
+import '../../tab_library/controllers/tab_library_controller.dart';
 import 'dart:math';
 import '../../main/controllers/mini_player_controller.dart';
+import '../../tab_home/controllers/tab_home_controller.dart';
 
 class PlayListController extends GetxController {
   final playlistId = ''.obs;
@@ -11,6 +18,7 @@ class PlayListController extends GetxController {
   final tracks = <YoutubeTrack>[].obs;
   final isLoading = true.obs;
   final miniPlayerController = Get.find<MiniPlayerController>();
+  final playlistProvider = Get.find<PlaylistProvider>();
 
   @override
   void onInit() {
@@ -78,24 +86,111 @@ class PlayListController extends GetxController {
   void playTrack(int index) {
     if (index >= 0 && index < tracks.length) {
       miniPlayerController.playAllTracks(tracks.toList(), startIndex: index);
+      _saveLastPlaylistInfo();
     }
   }
 
   void playAllTracks() {
     if (tracks.isNotEmpty) {
       miniPlayerController.playAllTracks(tracks.toList());
+      _saveLastPlaylistInfo();
     }
   }
 
   void shuffleAndPlay() {
     if (tracks.isNotEmpty) {
       miniPlayerController.shuffleAndPlay(tracks.toList());
+      _saveLastPlaylistInfo();
     }
   }
 
-  void removeTrack(int index) {
+  void _saveLastPlaylistInfo() {
+    if (tracks.isEmpty) return;
+
+    try {
+      // 홈 컨트롤러가 등록되어 있는지 확인
+      if (Get.isRegistered<TabHomeController>()) {
+        final homeController = Get.find<TabHomeController>();
+        homeController.saveLastPlaylist(
+          title: playlistName.value,
+          thumbnail: tracks.first.thumbnail,
+          playlistId: playlistId.value,
+          tracks: tracks.toList(),
+        );
+      }
+    } catch (e) {
+      logger.e('마지막 플레이리스트 정보 저장 실패: $e');
+    }
+  }
+
+  Future<void> removeTrack(int index) async {
     if (index >= 0 && index < tracks.length) {
-      tracks.removeAt(index);
+      final trackToRemove = tracks[index];
+
+      try {
+        final success = await playlistProvider.removeTrackFromPlaylist(
+          playlistId.value,
+          trackToRemove,
+        );
+
+        if (success) {
+          // 로컬 리스트에서도 제거
+          tracks.removeAt(index);
+          logger.d('트랙 삭제 완료: ${trackToRemove.title}');
+        } else {
+          logger.w('트랙 삭제 실패');
+        }
+      } catch (e) {
+        logger.e('트랙 삭제 중 오류 발생: $e');
+      }
+    }
+  }
+
+  void showEditPlaylistModal() {
+    Get.bottomSheet(
+      EditPlaylistModal(
+        playlistId: playlistId.value,
+        currentName: playlistName.value,
+      ),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+    ).then((newName) {
+      if (newName != null && newName is String) {
+        playlistName.value = newName;
+      }
+    });
+  }
+
+  void showDeletePlaylistDialog() {
+    Get.dialog(
+      DeletePlaylistDialog(
+        playlistName: playlistName.value,
+        onConfirm: _deletePlaylist,
+      ),
+    );
+  }
+
+  Future<void> _deletePlaylist() async {
+    try {
+      final success = await playlistProvider.deletePlaylist(playlistId.value);
+
+      if (success) {
+        SnackbarUtil.showSuccess('플레이리스트가 삭제되었습니다.');
+
+        // 라이브러리 화면으로 돌아가기
+        if (Get.isRegistered<TabLibraryController>()) {
+          final libraryController = Get.find<TabLibraryController>();
+          libraryController.closePlaylist();
+        }
+
+        // 현재 화면 닫기
+        Get.back();
+      } else {
+        SnackbarUtil.showError('플레이리스트 삭제에 실패했습니다.');
+      }
+    } catch (e) {
+      logger.e('플레이리스트 삭제 중 오류 발생: $e');
+      SnackbarUtil.showError('플레이리스트 삭제 중 오류가 발생했습니다.');
     }
   }
 

@@ -17,7 +17,12 @@ dependencies:
   firebase_core: ^3.6.0
   firebase_auth: ^5.3.3
   cloud_firestore: ^5.6.11
+  firebase_storage: ^12.3.5
+  firebase_database: ^11.1.5
   youtube_player_flutter: ^9.1.1
+  shared_preferences: ^2.2.2
+  image_picker: ^1.0.4
+  intl: ^0.19.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -3,6 +3,12 @@ import 'package:get/get.dart';
 
 import '../controllers/tab_search_controller.dart';
 import '../../../data/models/youtube_track_model.dart';
+import '../../../data/utils/snackbar_util.dart';
+import '../../../data/constants/app_colors.dart';
+import '../../../data/constants/app_sizes.dart';
+import '../../../data/constants/app_text_styles.dart';
+import '../../../data/utils/toss_loading_indicator.dart';
+import '../widgets/playlist_selector_dialog.dart';
 
 class TabSearchView extends GetView<TabSearchController> {
   const TabSearchView({super.key});
@@ -62,10 +68,7 @@ class TabSearchView extends GetView<TabSearchController> {
                     return const SizedBox(
                       width: 24.0,
                       height: 24.0,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
-                      ),
+                      child: TossLoadingIndicator(size: 40, strokeWidth: 3.0),
                     );
                   }
                   return const SizedBox.shrink();
@@ -216,16 +219,7 @@ class TabSearchView extends GetView<TabSearchController> {
             ),
           ),
           IconButton(
-            onPressed: () async {
-              final playlistName = await controller.addTrackToPlaylist(track);
-              if (playlistName != null) {
-                Get.snackbar(
-                  '알림',
-                  '\'${playlistName}\'에 등록되었습니다.',
-                  snackPosition: SnackPosition.BOTTOM,
-                );
-              }
-            },
+            onPressed: () => controller.showPlaylistSelector(track),
             icon: const Icon(
               Icons.add_circle_outline,
               color: Colors.blue,
@@ -241,10 +235,7 @@ class TabSearchView extends GetView<TabSearchController> {
     return Container(
       padding: const EdgeInsets.all(16.0),
       child: const Center(
-        child: CircularProgressIndicator(
-          strokeWidth: 2,
-          valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
-        ),
+        child: TossLoadingIndicator(size: 40, strokeWidth: 3.0),
       ),
     );
   }
