@@ -10,6 +10,7 @@ import '../../../data/utils/snackbar_util.dart';
 import '../widgets/playlist_selector_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
+import '../../main/controllers/mini_player_controller.dart';
 
 class TabSearchController extends GetxController {
   final SearchProvider _searchProvider = Get.find<SearchProvider>();
@@ -359,5 +360,11 @@ class TabSearchController extends GetxController {
   /// 플레이리스트 선택 다이얼로그 표시
   void showPlaylistSelector(YoutubeTrack track) {
     Get.dialog(PlaylistSelectorDialog(track: track), barrierDismissible: true);
+  }
+
+  /// 검색 결과에서 곡을 즉시 재생
+  void playTrack(YoutubeTrack track) {
+    final miniPlayerController = Get.find<MiniPlayerController>();
+    miniPlayerController.playVideo(track);
   }
 }

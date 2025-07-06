@@ -425,7 +425,7 @@ class TabHomeView extends GetView<TabHomeController> {
     // MiniPlayerController를 통해 바로 재생
     try {
       final miniPlayerController = Get.find<MiniPlayerController>();
-      miniPlayerController.playVideo(track.videoId, track.title);
+      miniPlayerController.playVideo(track);
     } catch (e) {
       // 에러 처리
       Get.snackbar(

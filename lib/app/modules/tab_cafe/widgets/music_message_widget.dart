@@ -202,7 +202,7 @@ class MusicMessageWidget extends StatelessWidget {
     try {
       // MiniPlayerController를 통해 재생
       final miniPlayerController = Get.find<MiniPlayerController>();
-      miniPlayerController.playVideo(track.videoId, track.title);
+      miniPlayerController.playVideo(track);
 
       Get.snackbar(
         '재생 시작',

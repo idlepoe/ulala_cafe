@@ -359,13 +359,28 @@ class TabSearchView extends GetView<TabSearchController> {
               ],
             ),
           ),
-          IconButton(
-            onPressed: () => controller.showPlaylistSelector(track),
-            icon: const Icon(
-              Icons.add_circle_outline,
-              color: Colors.blue,
-              size: 32.0,
-            ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                onPressed: () => controller.playTrack(track),
+                icon: const Icon(
+                  Icons.play_circle_fill,
+                  color: Colors.blue,
+                  size: 32.0,
+                ),
+                tooltip: '즉시 재생',
+              ),
+              IconButton(
+                onPressed: () => controller.showPlaylistSelector(track),
+                icon: const Icon(
+                  Icons.playlist_add,
+                  color: Colors.blue,
+                  size: 28.0,
+                ),
+                tooltip: '플레이리스트에 추가',
+              ),
+            ],
           ),
         ],
       ),

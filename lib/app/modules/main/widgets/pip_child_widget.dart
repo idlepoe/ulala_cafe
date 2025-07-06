@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ulala_cafe/app/modules/main/controllers/main_controller.dart';
 import 'package:ulala_cafe/app/modules/main/controllers/mini_player_controller.dart';
+import 'package:marquee/marquee.dart';
 
 class PipChildWidget extends GetView<MiniPlayerController> {
   const PipChildWidget({super.key});
@@ -9,16 +10,19 @@ class PipChildWidget extends GetView<MiniPlayerController> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
+      final thumbnail = controller.currentThumbnail.value;
+      final title = controller.currentVideoTitle.value;
+      final description =
+          controller.playlist.isNotEmpty &&
+              controller.currentIndex.value < controller.playlist.length
+          ? controller.playlist[controller.currentIndex.value].description ?? ''
+          : '';
       return Container(
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF0064FF), // Toss 브랜드 블루
-              Color(0xFF3182F6), // 밝은 블루
-              Color(0xFF1B73E8), // 구글 블루 톤
-            ],
+            colors: [Color(0xFF0064FF), Color(0xFF3182F6), Color(0xFF1B73E8)],
           ),
           boxShadow: [
             BoxShadow(
@@ -34,20 +38,30 @@ class PipChildWidget extends GetView<MiniPlayerController> {
           ],
         ),
         child: Stack(
+          fit: StackFit.expand,
           children: [
-            // 썸네일과 제목 영역 (dot indicator와 겹침)
+            // 배경 썸네일
+            if (thumbnail.isNotEmpty)
+              Positioned.fill(
+                child: Image.network(
+                  thumbnail,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                      Container(color: Colors.black12),
+                ),
+              ),
+            // 반투명 오버레이
             Positioned.fill(
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(
-                  16,
-                  16,
-                  16,
-                  50,
-                ), // 하단은 진행률 바 공간 확보
+              child: Container(color: Colors.black.withOpacity(0.45)),
+            ),
+            // 내용
+            Positioned.fill(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 50),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // 썸네일 영역
+                    // 썸네일 미리보기(왼쪽)
                     Container(
                       width: 60,
                       height: 60,
@@ -62,41 +76,80 @@ class PipChildWidget extends GetView<MiniPlayerController> {
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(12),
-                        child: Image.network(
-                          controller.currentThumbnail.value,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.9),
-                                borderRadius: BorderRadius.circular(12),
+                        child: thumbnail.isNotEmpty
+                            ? Image.network(
+                                thumbnail,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.9),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: const Icon(
+                                      Icons.music_note,
+                                      color: Color(0xFF0064FF),
+                                      size: 24,
+                                    ),
+                                  );
+                                },
+                              )
+                            : Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.9),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: const Icon(
+                                  Icons.music_note,
+                                  color: Color(0xFF0064FF),
+                                  size: 24,
+                                ),
                               ),
-                              child: const Icon(
-                                Icons.music_note,
-                                color: Color(0xFF0064FF),
-                                size: 24,
-                              ),
-                            );
-                          },
-                        ),
                       ),
                     ),
-
                     const SizedBox(width: 12),
-
                     // 텍스트 정보 영역
                     Expanded(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // Marquee 제목
+                          SizedBox(
+                            height: 18,
+                            child: Marquee(
+                              text: title,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: -0.2,
+                              ),
+                              scrollAxis: Axis.horizontal,
+                              blankSpace: 20.0,
+                              velocity: 30.0,
+                              pauseAfterRound: const Duration(seconds: 1),
+                              fadingEdgeStartFraction: 0.1,
+                              fadingEdgeEndFraction: 0.1,
+                              numberOfRounds: 3,
+                              startPadding: 0.0,
+                              accelerationDuration: const Duration(seconds: 1),
+                              accelerationCurve: Curves.linear,
+                              decelerationDuration: const Duration(
+                                milliseconds: 500,
+                              ),
+                              decelerationCurve: Curves.easeOut,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          // Description 2줄
                           Text(
-                            controller.currentVideoTitle.value,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: -0.2,
+                            description.isNotEmpty ? description : '설명 없음',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.85),
+                              fontSize: 10,
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: -0.1,
                             ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -108,7 +161,6 @@ class PipChildWidget extends GetView<MiniPlayerController> {
                 ),
               ),
             ),
-
             // 하단 진행률 바 영역 (Toss 스타일)
             Positioned(
               left: 0,

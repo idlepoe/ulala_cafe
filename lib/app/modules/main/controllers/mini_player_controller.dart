@@ -97,14 +97,13 @@ class MiniPlayerController extends GetxController {
   }
 
   void playVideo(
-    String videoId,
-    String title, {
+    YoutubeTrack track, {
     List<YoutubeTrack>? playlistData,
     int? index,
   }) {
-    currentVideoId.value = videoId;
-    currentVideoTitle.value = title;
-    currentThumbnail.value = YoutubePlayer.getThumbnail(videoId: videoId);
+    currentVideoId.value = track.videoId;
+    currentVideoTitle.value = track.title;
+    currentThumbnail.value = track.thumbnail;
 
     YoutubeTrack currentTrack;
 
@@ -114,17 +113,9 @@ class MiniPlayerController extends GetxController {
       currentIndex.value = index ?? 0;
       currentTrack = playlistData[index ?? 0];
     } else {
-      // 단일 곡 재생 - YoutubeTrack 객체 생성
-      currentTrack = YoutubeTrack(
-        id: videoId,
-        videoId: videoId,
-        title: title,
-        description: '',
-        channelTitle: '',
-        thumbnail: YoutubePlayer.getThumbnail(videoId: videoId),
-        publishedAt: DateTime.now().toIso8601String(),
-      );
-      playlist.value = [currentTrack];
+      // 단일 곡 재생
+      currentTrack = track;
+      playlist.value = [track];
       currentIndex.value = 0;
     }
 
@@ -132,13 +123,13 @@ class MiniPlayerController extends GetxController {
     _rankingProvider.updatePlayCount(currentTrack);
 
     if (youtubeController.value.isReady) {
-      youtubeController.load(videoId);
+      youtubeController.load(track.videoId);
       isPlaying.value = true;
     } else {
       // 컨트롤러가 준비되지 않았을 때 재초기화
       youtubeController.dispose();
       youtubeController = YoutubePlayerController(
-        initialVideoId: videoId,
+        initialVideoId: track.videoId,
         flags: const YoutubePlayerFlags(
           autoPlay: true,
           hideControls: true,
@@ -160,12 +151,7 @@ class MiniPlayerController extends GetxController {
     currentIndex.value = startIndex;
 
     final track = tracks[startIndex];
-    playVideo(
-      track.videoId,
-      track.title,
-      playlistData: tracks,
-      index: startIndex,
-    );
+    playVideo(track, playlistData: tracks, index: startIndex);
   }
 
   void shuffleAndPlay(List<YoutubeTrack> tracks) {
@@ -177,12 +163,7 @@ class MiniPlayerController extends GetxController {
     currentIndex.value = 0;
 
     final track = shuffledTracks[0];
-    playVideo(
-      track.videoId,
-      track.title,
-      playlistData: shuffledTracks,
-      index: 0,
-    );
+    playVideo(track, playlistData: shuffledTracks, index: 0);
   }
 
   void togglePlayer() {
