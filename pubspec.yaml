@@ -28,6 +28,7 @@ dependencies:
   url_launcher: ^6.2.4
   simple_pip_mode: ^1.1.0
   flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.4
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -45,12 +46,21 @@ flutter_launcher_icons:
   android: "launcher_icon"
   image_path: "assets/icon/icon.png"
   adaptive_icon_foreground: "assets/icon/icon.png"
-  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_background: "#f8e8fd"
   web:
     generate: true
     image_path: "assets/icon/icon.png"
-    background_color: "#FFFFFF"
-    theme_color: "#FFFFFF"
+    background_color: "#f8e8fd"
+    theme_color: "#f8e8fd"
   windows:
     generate: true
-    image_path: "assets/icon/icon.ico"
+    image_path: "assets/icon/icon.png"
+    background_color: "#f8e8fd"
+    theme_color: "#f8e8fd"
+flutter_native_splash:
+  color: "#f8e8fd"
+  image: assets/icon/icon.png
+  android_12:
+    image: assets/icon/icon.png
+    color: "#f8e8fd"
+  web: true

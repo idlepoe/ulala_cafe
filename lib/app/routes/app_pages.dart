@@ -6,6 +6,8 @@ import '../modules/main/bindings/main_binding.dart';
 import '../modules/main/views/main_view.dart';
 import '../modules/play_list/bindings/play_list_binding.dart';
 import '../modules/play_list/views/play_list_view.dart';
+import '../modules/setting/bindings/setting_binding.dart';
+import '../modules/setting/views/setting_view.dart';
 import '../modules/splash/bindings/splash_binding.dart';
 import '../modules/splash/views/splash_view.dart';
 import '../modules/tab_cafe/bindings/tab_cafe_binding.dart';
@@ -64,6 +66,11 @@ class AppPages {
       name: Routes.PLAY_LIST,
       page: () => const PlayListView(),
       binding: PlayListBinding(),
+    ),
+    GetPage(
+      name: _Paths.SETTING,
+      page: () => const SettingView(),
+      binding: SettingBinding(),
     ),
   ];
 }

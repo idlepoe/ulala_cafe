@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:marquee/marquee.dart';
+import 'package:ulala_cafe/app/routes/app_pages.dart';
 
 import '../controllers/tab_home_controller.dart';
 import '../../../data/constants/app_colors.dart';
@@ -14,14 +15,26 @@ class TabHomeView extends GetView<TabHomeController> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: AppColors.background,
-      child: SingleChildScrollView(
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        title: Text('홈', style: AppTextStyles.h1),
+        backgroundColor: AppColors.background,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: AppColors.primary),
+        actions: [
+          IconButton(
+            onPressed: () => Get.toNamed(Routes.SETTING),
+            icon: const Icon(Icons.settings),
+            color: AppColors.primary,
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
         padding: EdgeInsets.all(AppSizes.paddingL),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('홈', style: AppTextStyles.h1),
             SizedBox(height: AppSizes.marginL),
 
             // 마지막 재생 플레이리스트 섹션

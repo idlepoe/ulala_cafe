@@ -10,26 +10,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c202106c-b708-432f-9b90-ffe8d1c48a66" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/web/etc/delete_account.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/etc/policy.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/etc/report.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/animations/celebrate.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/animations/confetti.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/fonts/BMHANNAPro.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/fonts/BMKkubulimTTF.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/fonts/MapoGoldenPier.ttf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/ic_chat.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/ic_fix.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/ic_no_music.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/ic_session_make.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/ic_session_make_grey.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/ic_tab_favorite.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/ic_tab_search.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/ic_tab_track.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/icon-removebg.ico" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/icon-removebg.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/mode_dj.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/mode_general.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/mode_shuffle.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/drawable-v21/launch_background.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/drawable-v21/launch_background.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/drawable/launch_background.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/drawable/launch_background.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/values-night/styles.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/values-night/styles.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/src/main/res/values/styles.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/res/values/styles.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -53,6 +41,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Flutter.main.dart (1).executor": "Run",
     "Flutter.main.dart.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.cidr.known.project.marker": "true",
@@ -64,17 +53,17 @@
     "git-widget-placeholder": "main",
     "io.flutter.reload.alreadyRun": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Workspace/ulala_cafe/android",
+    "last_opened_file_path": "C:/Workspace/ulala_cafe/web",
     "show.migrate.to.gradle.popup": "false"
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Workspace\ulala_cafe\web" />
       <recent name="C:\Workspace\ulala_cafe\android" />
       <recent name="C:\Workspace\ulala_cafe\android\app" />
       <recent name="C:\Workspace\ulala_cafe\lib\app\data\models" />
       <recent name="C:\Workspace\ulala_cafe\lib\app\data" />
-      <recent name="C:\Workspace\ulala_cafe\functions" />
     </key>
   </component>
   <component name="RunManager" selected="Flutter.main.dart (1)">
