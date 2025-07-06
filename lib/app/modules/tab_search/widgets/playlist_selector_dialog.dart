@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ulala_cafe/app/data/utils/logger.dart';
 import '../../../data/constants/app_colors.dart';
 import '../../../data/constants/app_sizes.dart';
 import '../../../data/constants/app_text_styles.dart';
@@ -218,7 +219,9 @@ class _PlaylistSelectorDialogState extends State<PlaylistSelectorDialog> {
                 children: [
                   Expanded(
                     child: TextButton(
-                      onPressed: () => Get.back(),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
                       style: TextButton.styleFrom(
                         padding: EdgeInsets.symmetric(
                           vertical: AppSizes.paddingM,
@@ -273,6 +276,7 @@ class _PlaylistSelectorDialogState extends State<PlaylistSelectorDialog> {
 
   void _showCreatePlaylistDialog() {
     final playlistName = _playlistProvider.generatePlaylistName();
+    final playlistNameController = TextEditingController(text: playlistName);
 
     showDialog(
       context: context,
@@ -287,7 +291,7 @@ class _PlaylistSelectorDialogState extends State<PlaylistSelectorDialog> {
         ),
         content: TextField(
           autofocus: true,
-          controller: TextEditingController(text: playlistName),
+          controller: playlistNameController,
           style: AppTextStyles.body1.copyWith(color: AppColors.textPrimary),
           decoration: InputDecoration(
             labelText: '플레이리스트 이름',
@@ -316,13 +320,7 @@ class _PlaylistSelectorDialogState extends State<PlaylistSelectorDialog> {
           ),
           ElevatedButton(
             onPressed: () {
-              final controller =
-                  (context.findAncestorWidgetOfExactType<TextField>()
-                          as TextField?)
-                      ?.controller;
-              if (controller != null) {
-                _createPlaylist(controller.text);
-              }
+              _createPlaylist(playlistNameController.text);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
@@ -336,6 +334,7 @@ class _PlaylistSelectorDialogState extends State<PlaylistSelectorDialog> {
   }
 
   Future<void> _createPlaylist(String name) async {
+    logger.d('createPlaylist: $name');
     if (name.trim().isEmpty) {
       SnackbarUtil.showError('플레이리스트 이름을 입력해주세요.');
       return;

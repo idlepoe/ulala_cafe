@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:simple_pip_mode/simple_pip.dart';
 import 'firebase_options.dart';
 import 'app/routes/app_pages.dart';
+
+SimplePip? pip;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -15,7 +15,11 @@ class MiniPlayerView extends GetView<MiniPlayerController> {
       return AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
-        height: controller.isPlayerVisible.value ? 80 : 0,
+        height:
+            controller.isPlayerVisible.value &&
+                !controller.isPipModeActive.value
+            ? 80
+            : 0,
         child: controller.isPlayerVisible.value
             ? Stack(
                 children: [

@@ -1,4 +1,9 @@
+import 'dart:ui';
+
 import 'package:get/get.dart';
+import 'package:simple_pip_mode/simple_pip.dart';
+import 'package:ulala_cafe/app/data/utils/logger.dart';
+import 'package:ulala_cafe/main.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../../../data/models/youtube_track_model.dart';
 import '../../../data/providers/ranking_provider.dart';
@@ -21,11 +26,21 @@ class MiniPlayerController extends GetxController {
   final RxInt currentIndex = 0.obs;
   final RxBool isShuffleMode = false.obs;
 
+  // autoPipMode 관리용
+  SimplePip? _pip;
+
+  final progressPercentage = 0.0.obs; // 재생 진행률 (0.0 ~ 1.0)
+
+  final isPipModeActive = false.obs;
+
   @override
   void onInit() {
     super.onInit();
     initializeYoutubeController();
     _rankingProvider = Get.put(RankingProvider());
+
+    // pip 초기화
+    _initPip();
   }
 
   void initializeYoutubeController() {
@@ -52,6 +67,15 @@ class MiniPlayerController extends GetxController {
 
       currentPosition.value = position;
       totalDuration.value = duration;
+
+      progressPercentage.value = position / duration;
+
+      // autoPipMode 관리
+      if (isPlaying.value) {
+        _enableAutoPipMode();
+      } else {
+        _disableAutoPipMode();
+      }
 
       // 재생이 종료되었는지 확인
       if (youtubeController.value.playerState == PlayerState.ended) {
@@ -173,6 +197,18 @@ class MiniPlayerController extends GetxController {
     }
   }
 
+  void playPlayer() {
+    if (!youtubeController.value.isReady) return;
+    youtubeController.play();
+    isPlaying.value = true;
+  }
+
+  void pausePlayer() {
+    if (!youtubeController.value.isReady) return;
+    youtubeController.pause();
+    isPlaying.value = false;
+  }
+
   void playPrevious() {
     if (playlist.isEmpty) return;
 
@@ -245,5 +281,54 @@ class MiniPlayerController extends GetxController {
     youtubeController.removeListener(_playerListener);
     youtubeController.dispose();
     super.onClose();
+  }
+
+  /// 시간을 포맷하는 유틸리티 메서드
+  String formatTime(double seconds) {
+    if (seconds.isNaN || seconds.isInfinite) return '0:00';
+
+    final minutes = (seconds / 60).floor();
+    final remainingSeconds = (seconds % 60).floor();
+    return '${minutes}:${remainingSeconds.toString().padLeft(2, '0')}';
+  }
+
+  /// PiP 초기화 (autoPipMode 관리용)
+  Future<void> _initPip() async {
+    try {
+      bool isPipSupported = await SimplePip.isPipAvailable;
+      logger.i('PiP Support for autoPipMode: $isPipSupported');
+
+      if (isPipSupported) {
+        _pip = SimplePip();
+      }
+    } catch (e) {
+      logger.e('PiP initialization error: $e');
+    }
+  }
+
+  /// AutoPipMode 활성화 (재생 중일 때)
+  Future<void> _enableAutoPipMode() async {
+    if (_pip != null) {
+      try {
+        await _pip!.setAutoPipMode();
+        // logger.i('AutoPipMode enabled - playing');
+      } catch (e) {
+        // logger.e('Failed to enable AutoPipMode: $e');
+      }
+    }
+  }
+
+  /// AutoPipMode 비활성화 (재생 중이 아닐 때)
+  Future<void> _disableAutoPipMode() async {
+    if (_pip != null) {
+      try {
+        // simple_pip_mode에서 autoPipMode를 비활성화하는 직접적인 방법이 없으므로
+        // 새 인스턴스를 생성하여 기본 상태로 리셋
+        await _pip!.setAutoPipMode(autoEnter: false);
+        // logger.i('AutoPipMode disabled - not playing');
+      } catch (e) {
+        // logger.e('Failed to disable AutoPipMode: $e');
+      }
+    }
   }
 }

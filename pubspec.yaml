@@ -26,6 +26,7 @@ dependencies:
   marquee: ^2.2.3
   flutter_linkify: ^6.0.0
   url_launcher: ^6.2.4
+  simple_pip_mode: ^1.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

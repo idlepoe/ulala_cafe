@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ulala_cafe/app/data/utils/logger.dart';
 import '../../../data/constants/app_colors.dart';
 import '../../../data/constants/app_sizes.dart';
 import '../../../data/constants/app_text_styles.dart';
@@ -47,6 +48,7 @@ class _CreatePlaylistModalState extends State<CreatePlaylistModal> {
   }
 
   Future<void> _createPlaylist() async {
+    logger.d('createPlaylist: ${_nameController.text}');
     if (_nameController.text.trim().isEmpty) {
       SnackbarUtil.showError('플레이리스트 이름을 입력해주세요.');
       return;
