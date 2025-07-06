@@ -63,6 +63,26 @@ class TabSearchView extends GetView<TabSearchController> {
                     },
                   ),
                 ),
+                // 검색창 초기화 버튼
+                Obx(() {
+                  if (controller.hasSearchText.value) {
+                    return GestureDetector(
+                      onTap: () {
+                        controller.clearSearch();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Icon(
+                          Icons.clear,
+                          color: Colors.grey[600],
+                          size: 20.0,
+                        ),
+                      ),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                }),
+                const SizedBox(width: 8.0),
                 Obx(() {
                   if (controller.isSearching.value) {
                     return const SizedBox(
@@ -76,6 +96,83 @@ class TabSearchView extends GetView<TabSearchController> {
               ],
             ),
           ),
+
+          // 검색 제한 안내 문구
+          Obx(() {
+            if (controller.isSearchLimited.value) {
+              return Container(
+                margin: const EdgeInsets.only(top: 8.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 12.0,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.orange[50],
+                  borderRadius: BorderRadius.circular(8.0),
+                  border: Border.all(color: Colors.orange[300]!),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.info_outline,
+                      color: Colors.orange[600],
+                      size: 20.0,
+                    ),
+                    const SizedBox(width: 12.0),
+                    Expanded(
+                      child: Text(
+                        'YouTube 검색 제한으로 인해 새로운 검색이 제한되었습니다. ${controller.formattedTimeUntilReset} 후 검색 횟수가 충전됩니다.\n(최근 검색어는 계속 사용 가능합니다)',
+                        style: TextStyle(
+                          fontSize: 14.0,
+                          color: Colors.orange[700],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+            return const SizedBox.shrink();
+          }),
+
+          // 검색 횟수 및 카운트다운 표시
+          Obx(() {
+            if (controller.showCountdown.value) {
+              return Container(
+                margin: const EdgeInsets.only(top: 8.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 8.0,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.blue[50],
+                  borderRadius: BorderRadius.circular(8.0),
+                  border: Border.all(color: Colors.blue[200]!),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.access_time,
+                      color: Colors.blue[600],
+                      size: 16.0,
+                    ),
+                    const SizedBox(width: 8.0),
+                    Expanded(
+                      child: Text(
+                        '검색 가능: ${controller.remainingSearchCount}번 남음 | 충전까지: ${controller.formattedTimeUntilReset}',
+                        style: TextStyle(
+                          fontSize: 12.0,
+                          color: Colors.blue[700],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+            return const SizedBox.shrink();
+          }),
+
           const SizedBox(height: 16.0),
           // 최근 검색어 Chips
           Obx(() {
@@ -146,10 +243,54 @@ class TabSearchView extends GetView<TabSearchController> {
                   ),
                 );
               }
+
+              // 검색 결과가 없을 때의 중앙 메시지
+              if (controller.isSearchLimited.value) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.search_off,
+                        size: 48.0,
+                        color: Colors.orange[400],
+                      ),
+                      const SizedBox(height: 16.0),
+                      Text(
+                        'YouTube 검색 제한',
+                        style: TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.orange[700],
+                        ),
+                      ),
+                      const SizedBox(height: 8.0),
+                      Text(
+                        '${controller.formattedTimeUntilReset} 후 검색 횟수가 충전됩니다',
+                        style: TextStyle(
+                          fontSize: 14.0,
+                          color: Colors.orange[600],
+                        ),
+                      ),
+                      const SizedBox(height: 8.0),
+                      Text(
+                        '(최근 검색어는 계속 사용 가능합니다)',
+                        style: TextStyle(
+                          fontSize: 12.0,
+                          color: Colors.orange[500],
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
               return const Center(
                 child: Text(
-                  '검색어를 입력하고 Enter를 눌러주세요',
+                  '음악을 검색해보세요\n(10분마다 3번의 검색 기회가 제공됩니다)',
                   style: TextStyle(fontSize: 16.0, color: Colors.grey),
+                  textAlign: TextAlign.center,
                 ),
               );
             }),

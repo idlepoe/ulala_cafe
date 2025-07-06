@@ -97,11 +97,11 @@ class MiniPlayerView extends GetView<MiniPlayerController> {
                                   child: Text(
                                     controller.currentVideoTitle.value,
                                     style: const TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 12,
                                       fontWeight: FontWeight.w600,
                                       color: Color(0xFF191F28),
                                     ),
-                                    maxLines: 1,
+                                    maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
@@ -132,7 +132,7 @@ class MiniPlayerView extends GetView<MiniPlayerController> {
                                       icon: Icons.skip_next,
                                       onPressed: controller.playNext,
                                     ),
-                                    const SizedBox(width: 8),
+                                    const SizedBox(width: 15),
                                     // 닫기 버튼
                                     _buildControlButton(
                                       icon: Icons.close,

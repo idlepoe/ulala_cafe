@@ -55,8 +55,20 @@ class MiniPlayerController extends GetxController {
 
       // 재생이 종료되었는지 확인
       if (youtubeController.value.playerState == PlayerState.ended) {
-        playNext();
+        _handlePlaybackEnd();
       }
+    }
+  }
+
+  void _handlePlaybackEnd() {
+    // 플레이리스트가 없거나 마지막 곡인 경우 플레이어 닫기
+    if (playlist.isEmpty || currentIndex.value >= playlist.length - 1) {
+      hidePlayer();
+    } else {
+      // 다음 곡으로 넘어가기
+      currentIndex.value++;
+      final track = playlist[currentIndex.value];
+      _updateCurrentTrack(track);
     }
   }
 
@@ -179,12 +191,14 @@ class MiniPlayerController extends GetxController {
 
     if (currentIndex.value < playlist.length - 1) {
       currentIndex.value++;
+      final track = playlist[currentIndex.value];
+      _updateCurrentTrack(track);
     } else {
-      currentIndex.value = 0; // 첫 번째 곡으로
+      // 마지막 곡에서 다음 버튼을 눌렀을 때는 첫 번째 곡으로 이동
+      currentIndex.value = 0;
+      final track = playlist[currentIndex.value];
+      _updateCurrentTrack(track);
     }
-
-    final track = playlist[currentIndex.value];
-    _updateCurrentTrack(track);
   }
 
   void _updateCurrentTrack(YoutubeTrack track) {
