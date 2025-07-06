@@ -6,22 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="c202106c-b708-432f-9b90-ffe8d1c48a66" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/firebase.json" beforeDir="false" afterPath="$PROJECT_DIR$/firebase.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/app/data/utils/api_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/app/data/utils/api_service.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/app/modules/main/bindings/main_binding.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/app/modules/main/bindings/main_binding.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/app/modules/main/controllers/main_controller.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/app/modules/main/controllers/main_controller.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/app/modules/play_list/controllers/play_list_controller.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/app/modules/play_list/controllers/play_list_controller.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/app/modules/play_list/views/play_list_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/app/modules/play_list/views/play_list_view.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/app/modules/splash/controllers/splash_controller.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/app/modules/splash/controllers/splash_controller.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/app/modules/tab_cafe/controllers/tab_cafe_controller.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/app/modules/tab_cafe/controllers/tab_cafe_controller.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/app/modules/main/controllers/mini_player_controller.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/app/modules/main/controllers/mini_player_controller.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/app/modules/tab_cafe/views/tab_cafe_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/app/modules/tab_cafe/views/tab_cafe_view.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/app/modules/tab_home/controllers/tab_home_controller.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/app/modules/tab_home/controllers/tab_home_controller.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/app/modules/tab_home/views/tab_home_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/app/modules/tab_home/views/tab_home_view.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/app/modules/tab_library/controllers/tab_library_controller.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/app/modules/tab_library/controllers/tab_library_controller.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/app/modules/tab_library/views/tab_library_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/app/modules/tab_library/views/tab_library_view.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/app/modules/tab_search/controllers/tab_search_controller.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/app/modules/tab_search/controllers/tab_search_controller.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/app/modules/tab_search/views/tab_search_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/app/modules/tab_search/views/tab_search_view.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/main.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/windows/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/windows/flutter/generated_plugin_registrant.cc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/windows/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/windows/flutter/generated_plugins.cmake" afterDir="false" />

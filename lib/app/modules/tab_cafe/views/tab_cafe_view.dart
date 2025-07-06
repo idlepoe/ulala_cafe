@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../controllers/tab_cafe_controller.dart';
 import '../../../data/constants/app_colors.dart';
@@ -338,11 +340,27 @@ class TabCafeView extends GetView<TabCafeController> {
           ),
         ],
       ),
-      child: Text(
-        message.message,
+      child: SelectableLinkify(
+        text: message.message,
         style: AppTextStyles.body1.copyWith(
           color: isMyMessage ? Colors.white : AppColors.textPrimary,
         ),
+        linkStyle: AppTextStyles.body1.copyWith(
+          color: isMyMessage ? Colors.white : AppColors.primary,
+          decoration: TextDecoration.underline,
+        ),
+        onOpen: (link) async {
+          final url = Uri.parse(link.url);
+          if (await canLaunchUrl(url)) {
+            await launchUrl(url, mode: LaunchMode.externalApplication);
+          } else {
+            Get.snackbar(
+              '링크 오류',
+              '이 링크를 열 수 없습니다.',
+              snackPosition: SnackPosition.BOTTOM,
+            );
+          }
+        },
       ),
     );
   }

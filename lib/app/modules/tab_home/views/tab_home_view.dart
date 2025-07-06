@@ -1,32 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:marquee/marquee.dart';
 
 import '../controllers/tab_home_controller.dart';
 import '../../../data/constants/app_colors.dart';
 import '../../../data/constants/app_sizes.dart';
 import '../../../data/constants/app_text_styles.dart';
+import '../../main/controllers/mini_player_controller.dart';
 
 class TabHomeView extends GetView<TabHomeController> {
   const TabHomeView({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(
       color: AppColors.background,
-      padding: EdgeInsets.all(AppSizes.paddingL),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('홈', style: AppTextStyles.h1),
-          SizedBox(height: AppSizes.marginL),
+      child: SingleChildScrollView(
+        padding: EdgeInsets.all(AppSizes.paddingL),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('홈', style: AppTextStyles.h1),
+            SizedBox(height: AppSizes.marginL),
 
-          // 마지막 재생 플레이리스트 섹션
-          Obx(() {
-            if (!controller.hasLastPlaylist.value) {
-              return _buildWelcomeCard();
-            }
-            return _buildLastPlaylistCard();
-          }),
-        ],
+            // 마지막 재생 플레이리스트 섹션
+            Obx(() {
+              if (!controller.hasLastPlaylist.value) {
+                return _buildWelcomeCard();
+              }
+              return _buildLastPlaylistCard();
+            }),
+
+            SizedBox(height: AppSizes.marginXL),
+
+            // 인기 차트 섹션
+            _buildPopularCharts(),
+          ],
+        ),
       ),
     );
   }
@@ -170,5 +180,227 @@ class TabHomeView extends GetView<TabHomeController> {
         ],
       ),
     );
+  }
+
+  Widget _buildPopularCharts() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('인기 차트', style: AppTextStyles.h2),
+            Obx(
+              () => controller.isLoadingRankings.value
+                  ? SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.primary,
+                      ),
+                    )
+                  : SizedBox.shrink(),
+            ),
+          ],
+        ),
+        SizedBox(height: AppSizes.marginL),
+
+        // 일일 인기
+        Obx(() => _buildChartSection('오늘의 인기 음악', controller.dailyRankings)),
+        SizedBox(height: AppSizes.marginL),
+
+        // 주간 인기
+        Obx(() => _buildChartSection('이번 주 인기 음악', controller.weeklyRankings)),
+        SizedBox(height: AppSizes.marginL),
+
+        // 월간 인기
+        Obx(() => _buildChartSection('이번 달 인기 음악', controller.monthlyRankings)),
+      ],
+    );
+  }
+
+  Widget _buildChartSection(String title, List<dynamic> tracks) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: AppTextStyles.h4),
+        SizedBox(height: AppSizes.marginM),
+
+        if (tracks.isEmpty)
+          Container(
+            height: 165, // 카드 리스트와 동일한 높이
+            alignment: Alignment.center,
+            child: Text(
+              '재생된 음악이 없습니다',
+              style: AppTextStyles.body2.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+          )
+        else
+          SizedBox(
+            height: 165, // 높이를 늘림
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: tracks.length,
+              itemBuilder: (context, index) {
+                final track = tracks[index];
+                return _buildTrackCard(track, index + 1);
+              },
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildTrackCard(dynamic track, int rank) {
+    return GestureDetector(
+      onTap: () => _playTrack(track),
+      child: Container(
+        width: 180, // 카드 폭을 늘림
+        margin: EdgeInsets.only(right: AppSizes.marginM),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(AppSizes.radiusM),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.shadowLight,
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 썸네일과 순위
+            Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(AppSizes.radiusM),
+                  ),
+                  child: Image.network(
+                    track.thumbnail,
+                    width: double.infinity,
+                    height: 90, // 썸네일 높이를 늘림
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      width: double.infinity,
+                      height: 90,
+                      color: AppColors.background,
+                      child: const Icon(
+                        Icons.music_note,
+                        color: AppColors.textTertiary,
+                      ),
+                    ),
+                  ),
+                ),
+                // 순위 표시
+                Positioned(
+                  top: 4,
+                  left: 4,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: rank <= 3
+                          ? AppColors.primary
+                          : Colors.black.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      '$rank',
+                      style: AppTextStyles.caption.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            // 음악 정보
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8), // 패딩을 늘림
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // 제목 (marquee)
+                    SizedBox(
+                      height: 18,
+                      child: Marquee(
+                        text: track.title,
+                        style: AppTextStyles.body2.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                        scrollAxis: Axis.horizontal,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        blankSpace: 20.0,
+                        velocity: 30.0,
+                        pauseAfterRound: Duration(seconds: 1),
+                        showFadingOnlyWhenScrolling: true,
+                        fadingEdgeStartFraction: 0.1,
+                        fadingEdgeEndFraction: 0.1,
+                        numberOfRounds: 3,
+                        startPadding: 0.0,
+                        accelerationDuration: Duration(seconds: 1),
+                        accelerationCurve: Curves.linear,
+                        decelerationDuration: Duration(milliseconds: 500),
+                        decelerationCurve: Curves.easeOut,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    // 채널명 (고정)
+                    Text(
+                      track.channelTitle,
+                      style: AppTextStyles.caption.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: 2),
+                    // 설명 (고정)
+                    Text(
+                      track.description.isNotEmpty
+                          ? track.description
+                          : '설명이 없습니다',
+                      style: AppTextStyles.caption.copyWith(
+                        color: AppColors.textSecondary.withOpacity(0.7),
+                        fontSize: 10,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _playTrack(dynamic track) {
+    // MiniPlayerController를 통해 바로 재생
+    try {
+      final miniPlayerController = Get.find<MiniPlayerController>();
+      miniPlayerController.playVideo(track.videoId, track.title);
+    } catch (e) {
+      // 에러 처리
+      Get.snackbar(
+        '재생 오류',
+        '음악을 재생할 수 없습니다.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
   }
 }

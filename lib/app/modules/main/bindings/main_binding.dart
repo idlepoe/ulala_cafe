@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:ulala_cafe/app/data/providers/ranking_provider.dart';
 
 import '../controllers/main_controller.dart';
 import '../controllers/mini_player_controller.dart';
@@ -18,6 +19,7 @@ class MainBinding extends Bindings {
     // Providers
     Get.lazyPut<SearchProvider>(() => SearchProvider());
     Get.put<PlaylistProvider>(PlaylistProvider(), permanent: true);
+    Get.put(RankingProvider());
 
     // Tab Controllers
     Get.put<TabHomeController>(TabHomeController());

@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../../../data/models/youtube_track_model.dart';
+import '../../../data/providers/ranking_provider.dart';
 
 class MiniPlayerController extends GetxController {
   late YoutubePlayerController youtubeController;
@@ -12,6 +13,9 @@ class MiniPlayerController extends GetxController {
   final RxDouble currentPosition = 0.0.obs;
   final RxDouble totalDuration = 0.0.obs;
 
+  // 랭킹 업데이트를 위한 RankingProvider
+  late RankingProvider _rankingProvider;
+
   // 플레이리스트 관리
   final RxList<YoutubeTrack> playlist = <YoutubeTrack>[].obs;
   final RxInt currentIndex = 0.obs;
@@ -21,6 +25,7 @@ class MiniPlayerController extends GetxController {
   void onInit() {
     super.onInit();
     initializeYoutubeController();
+    _rankingProvider = Get.put(RankingProvider());
   }
 
   void initializeYoutubeController() {
@@ -65,13 +70,16 @@ class MiniPlayerController extends GetxController {
     currentVideoTitle.value = title;
     currentThumbnail.value = YoutubePlayer.getThumbnail(videoId: videoId);
 
+    YoutubeTrack currentTrack;
+
     // 플레이리스트 설정
     if (playlistData != null) {
       playlist.value = playlistData;
       currentIndex.value = index ?? 0;
+      currentTrack = playlistData[index ?? 0];
     } else {
       // 단일 곡 재생 - YoutubeTrack 객체 생성
-      final track = YoutubeTrack(
+      currentTrack = YoutubeTrack(
         id: videoId,
         videoId: videoId,
         title: title,
@@ -80,9 +88,12 @@ class MiniPlayerController extends GetxController {
         thumbnail: YoutubePlayer.getThumbnail(videoId: videoId),
         publishedAt: DateTime.now().toIso8601String(),
       );
-      playlist.value = [track];
+      playlist.value = [currentTrack];
       currentIndex.value = 0;
     }
+
+    // 재생 시 랭킹 업데이트 (낙관적 업데이트)
+    _rankingProvider.updatePlayCount(currentTrack);
 
     if (youtubeController.value.isReady) {
       youtubeController.load(videoId);
