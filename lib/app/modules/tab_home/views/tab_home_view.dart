@@ -7,6 +7,7 @@ import '../../../data/constants/app_colors.dart';
 import '../../../data/constants/app_sizes.dart';
 import '../../../data/constants/app_text_styles.dart';
 import '../../main/controllers/mini_player_controller.dart';
+import '../../tab_search/widgets/playlist_selector_dialog.dart';
 
 class TabHomeView extends GetView<TabHomeController> {
   const TabHomeView({super.key});
@@ -229,7 +230,7 @@ class TabHomeView extends GetView<TabHomeController> {
 
         if (tracks.isEmpty)
           Container(
-            height: 165, // 카드 리스트와 동일한 높이
+            height: 200, // 버튼 추가로 높이 증가
             alignment: Alignment.center,
             child: Text(
               '재생된 음악이 없습니다',
@@ -240,7 +241,7 @@ class TabHomeView extends GetView<TabHomeController> {
           )
         else
           SizedBox(
-            height: 165, // 높이를 늘림
+            height: 200, // 버튼 추가로 높이 증가
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: tracks.length,
@@ -255,27 +256,27 @@ class TabHomeView extends GetView<TabHomeController> {
   }
 
   Widget _buildTrackCard(dynamic track, int rank) {
-    return GestureDetector(
-      onTap: () => _playTrack(track),
-      child: Container(
-        width: 180, // 카드 폭을 늘림
-        margin: EdgeInsets.only(right: AppSizes.marginM),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(AppSizes.radiusM),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.shadowLight,
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 썸네일과 순위
-            Stack(
+    return Container(
+      width: 180, // 카드 폭을 늘림
+      margin: EdgeInsets.only(right: AppSizes.marginM),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppSizes.radiusM),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadowLight,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 썸네일과 순위
+          GestureDetector(
+            onTap: () => _playTrack(track),
+            child: Stack(
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.vertical(
@@ -323,68 +324,99 @@ class TabHomeView extends GetView<TabHomeController> {
                 ),
               ],
             ),
+          ),
 
-            // 음악 정보
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(8), // 패딩을 늘림
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // 제목 (marquee)
-                    SizedBox(
-                      height: 18,
-                      child: Marquee(
-                        text: track.title,
-                        style: AppTextStyles.body2.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                        scrollAxis: Axis.horizontal,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        blankSpace: 20.0,
-                        velocity: 30.0,
-                        pauseAfterRound: Duration(seconds: 1),
-                        showFadingOnlyWhenScrolling: true,
-                        fadingEdgeStartFraction: 0.1,
-                        fadingEdgeEndFraction: 0.1,
-                        numberOfRounds: 3,
-                        startPadding: 0.0,
-                        accelerationDuration: Duration(seconds: 1),
-                        accelerationCurve: Curves.linear,
-                        decelerationDuration: Duration(milliseconds: 500),
-                        decelerationCurve: Curves.easeOut,
+          // 음악 정보
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(8), // 패딩을 늘림
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // 제목 (marquee)
+                  SizedBox(
+                    height: 18,
+                    child: Marquee(
+                      text: track.title,
+                      style: AppTextStyles.body2.copyWith(
+                        fontWeight: FontWeight.w600,
                       ),
+                      scrollAxis: Axis.horizontal,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      blankSpace: 20.0,
+                      velocity: 30.0,
+                      pauseAfterRound: Duration(seconds: 1),
+                      showFadingOnlyWhenScrolling: true,
+                      fadingEdgeStartFraction: 0.1,
+                      fadingEdgeEndFraction: 0.1,
+                      numberOfRounds: 3,
+                      startPadding: 0.0,
+                      accelerationDuration: Duration(seconds: 1),
+                      accelerationCurve: Curves.linear,
+                      decelerationDuration: Duration(milliseconds: 500),
+                      decelerationCurve: Curves.easeOut,
                     ),
-                    SizedBox(height: 4),
-                    // 채널명 (고정)
-                    Text(
-                      track.channelTitle,
-                      style: AppTextStyles.caption.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 4),
+                  // 설명 (고정)
+                  Text(
+                    track.description.isNotEmpty
+                        ? track.description
+                        : '설명이 없습니다',
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.textSecondary.withOpacity(0.7),
+                      fontSize: 10,
                     ),
-                    SizedBox(height: 2),
-                    // 설명 (고정)
-                    Text(
-                      track.description.isNotEmpty
-                          ? track.description
-                          : '설명이 없습니다',
-                      style: AppTextStyles.caption.copyWith(
-                        color: AppColors.textSecondary.withOpacity(0.7),
-                        fontSize: 10,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Toss 스타일 플레이리스트 추가 버튼
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+            child: SizedBox(
+              width: double.infinity,
+              height: 32,
+              child: ElevatedButton.icon(
+                onPressed: () => _showPlaylistSelector(track),
+                icon: Icon(
+                  Icons.playlist_add,
+                  size: 16,
+                  color: AppColors.primary,
+                ),
+                label: Text(
+                  '추가',
+                  style: AppTextStyles.body3.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.surface,
+                  foregroundColor: AppColors.primary,
+                  elevation: 0,
+                  shadowColor: Colors.transparent,
+                  side: BorderSide(
+                    color: AppColors.primary.withOpacity(0.3),
+                    width: 1,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppSizes.radiusS),
+                  ),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppSizes.paddingS,
+                    vertical: 0,
+                  ),
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -402,5 +434,9 @@ class TabHomeView extends GetView<TabHomeController> {
         snackPosition: SnackPosition.BOTTOM,
       );
     }
+  }
+
+  void _showPlaylistSelector(dynamic track) {
+    Get.dialog(PlaylistSelectorDialog(track: track), barrierDismissible: true);
   }
 }
