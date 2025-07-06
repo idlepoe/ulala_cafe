@@ -1,11 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AndroidLayouts">
+    <shared>
+      <config />
+    </shared>
+  </component>
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c202106c-b708-432f-9b90-ffe8d1c48a66" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/lib/app/modules/main/controllers/mini_player_controller.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/app/modules/main/controllers/mini_player_controller.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/animations/celebrate.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/animations/confetti.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/fonts/BMHANNAPro.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/fonts/BMKkubulimTTF.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/fonts/MapoGoldenPier.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/ic_chat.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/ic_fix.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/ic_no_music.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/ic_session_make.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/ic_session_make_grey.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/ic_tab_favorite.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/ic_tab_search.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/ic_tab_track.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/icon-removebg.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/icon-removebg.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/mode_dj.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/mode_general.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/images/mode_shuffle.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,36 +51,46 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Flutter.main.dart.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
-    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;io.flutter.reload.alreadyRun&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Workspace/ulala_now2&quot;,
-    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Flutter.main.dart.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "main",
+    "io.flutter.reload.alreadyRun": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Workspace/ulala_cafe/android",
+    "show.migrate.to.gradle.popup": "false"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Workspace\ulala_cafe\android" />
+      <recent name="C:\Workspace\ulala_cafe\android\app" />
       <recent name="C:\Workspace\ulala_cafe\lib\app\data\models" />
       <recent name="C:\Workspace\ulala_cafe\lib\app\data" />
       <recent name="C:\Workspace\ulala_cafe\functions" />
-      <recent name="C:\Workspace\ulala_cafe" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Flutter.main.dart (1)">
+    <configuration name="main.dart (1)" type="FlutterRunConfigurationType" factoryName="Flutter">
+      <option name="additionalArgs" value="--release" />
+      <option name="filePath" value="$PROJECT_DIR$/lib/main.dart" />
+      <method v="2" />
+    </configuration>
     <configuration name="main.dart" type="FlutterRunConfigurationType" factoryName="Flutter">
       <option name="filePath" value="$PROJECT_DIR$/lib/main.dart" />
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="Flutter.main.dart" />
+      <item itemvalue="Flutter.main.dart (1)" />
+    </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">

@@ -41,10 +41,6 @@ flutter:
     - assets/icon/
     - assets/fonts/
     - assets/animations/
-  fonts:
-    - family: MapoGoldenPier
-      fonts:
-        - asset: assets/fonts/MapoGoldenPier.ttf
 flutter_launcher_icons:
   android: "launcher_icon"
   image_path: "assets/icon/icon.png"
