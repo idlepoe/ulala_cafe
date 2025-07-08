@@ -13,8 +13,10 @@ Widget pipWidget({required Widget child}) {
     pipChild: const PipChildWidget(),
     pipLayout: PipActionsLayout.media,
     onPipEntered: () {
-      // PiP 모드 진입
-      controller.isPipModeActive.value = true;
+      // PiP 모드 진입 - 재생 중이고 플레이어가 보일 때만
+      if (controller.isPlaying.value && controller.isPlayerVisible.value) {
+        controller.isPipModeActive.value = true;
+      }
     },
     onPipExited: () {
       // PiP 모드 종료

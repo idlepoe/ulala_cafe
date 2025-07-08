@@ -5,6 +5,7 @@ import 'package:simple_pip_mode/simple_pip.dart';
 import 'package:ulala_cafe/app/data/utils/logger.dart';
 import 'package:ulala_cafe/main.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:flutter/widgets.dart';
 import '../../../data/models/youtube_track_model.dart';
 import '../../../data/providers/ranking_provider.dart';
 
@@ -41,6 +42,9 @@ class MiniPlayerController extends GetxController {
 
     // pip 초기화
     _initPip();
+
+    // 앱 생명주기 감지
+    _setupAppLifecycleListener();
   }
 
   void initializeYoutubeController() {
@@ -70,8 +74,8 @@ class MiniPlayerController extends GetxController {
 
       progressPercentage.value = position / duration;
 
-      // autoPipMode 관리
-      if (isPlaying.value) {
+      // autoPipMode 관리 - 재생 중이고 플레이어가 보일 때만 활성화
+      if (isPlaying.value && isPlayerVisible.value) {
         _enableAutoPipMode();
       } else {
         _disableAutoPipMode();
@@ -249,6 +253,9 @@ class MiniPlayerController extends GetxController {
     playlist.clear();
     currentIndex.value = 0;
     isShuffleMode.value = false;
+
+    // 플레이어를 숨길 때 PiP 모드 비활성화
+    _disableAutoPipMode();
   }
 
   void seekTo(double seconds) {
@@ -259,6 +266,9 @@ class MiniPlayerController extends GetxController {
 
   @override
   void onClose() {
+    // PiP 모드 비활성화
+    _disableAutoPipMode();
+
     youtubeController.removeListener(_playerListener);
     youtubeController.dispose();
     super.onClose();
@@ -289,12 +299,12 @@ class MiniPlayerController extends GetxController {
 
   /// AutoPipMode 활성화 (재생 중일 때)
   Future<void> _enableAutoPipMode() async {
-    if (_pip != null) {
+    if (_pip != null && isPlaying.value && isPlayerVisible.value) {
       try {
         await _pip!.setAutoPipMode();
-        // logger.i('AutoPipMode enabled - playing');
+        logger.d('AutoPipMode enabled - playing and visible');
       } catch (e) {
-        // logger.e('Failed to enable AutoPipMode: $e');
+        logger.e('Failed to enable AutoPipMode: $e');
       }
     }
   }
@@ -306,10 +316,64 @@ class MiniPlayerController extends GetxController {
         // simple_pip_mode에서 autoPipMode를 비활성화하는 직접적인 방법이 없으므로
         // 새 인스턴스를 생성하여 기본 상태로 리셋
         await _pip!.setAutoPipMode(autoEnter: false);
-        // logger.i('AutoPipMode disabled - not playing');
+        logger.d('AutoPipMode disabled - not playing or hidden');
       } catch (e) {
-        // logger.e('Failed to disable AutoPipMode: $e');
+        logger.e('Failed to disable AutoPipMode: $e');
       }
+    }
+  }
+
+  /// 앱 생명주기 리스너 설정
+  void _setupAppLifecycleListener() {
+    WidgetsBinding.instance.addObserver(
+      LifecycleEventHandler(
+        detachedCallBack: () async {
+          // 앱이 완전히 종료될 때 PiP 모드 비활성화
+          logger.d('App detached - disabling PiP mode');
+          await _disableAutoPipMode();
+        },
+        pausedCallBack: () async {
+          // 앱이 백그라운드로 갈 때 재생 중이 아니면 PiP 모드 비활성화
+          if (!isPlaying.value) {
+            logger.d('App paused and not playing - disabling PiP mode');
+            await _disableAutoPipMode();
+          }
+        },
+        resumedCallBack: () async {
+          // 앱이 포그라운드로 돌아올 때 상태 확인
+          logger.d('App resumed - checking PiP mode');
+        },
+      ),
+    );
+  }
+}
+
+/// 앱 생명주기 이벤트 핸들러
+class LifecycleEventHandler extends WidgetsBindingObserver {
+  final Future<void> Function()? detachedCallBack;
+  final Future<void> Function()? pausedCallBack;
+  final Future<void> Function()? resumedCallBack;
+
+  LifecycleEventHandler({
+    this.detachedCallBack,
+    this.pausedCallBack,
+    this.resumedCallBack,
+  });
+
+  @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    switch (state) {
+      case AppLifecycleState.detached:
+        if (detachedCallBack != null) await detachedCallBack!();
+        break;
+      case AppLifecycleState.paused:
+        if (pausedCallBack != null) await pausedCallBack!();
+        break;
+      case AppLifecycleState.resumed:
+        if (resumedCallBack != null) await resumedCallBack!();
+        break;
+      default:
+        break;
     }
   }
 }

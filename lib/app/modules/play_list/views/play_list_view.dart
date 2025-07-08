@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../controllers/play_list_controller.dart';
+import '../../main/controllers/main_controller.dart';
 import '../../../data/constants/app_colors.dart';
 import '../../../data/constants/app_sizes.dart';
 import '../../../data/constants/app_text_styles.dart';
@@ -273,11 +274,9 @@ class PlayListView extends GetView<PlayListController> {
                     SizedBox(height: AppSizes.marginXL),
                     ElevatedButton.icon(
                       onPressed: () {
-                        // 검색 화면으로 이동
-                        Get.toNamed(
-                          Routes.MAIN,
-                          arguments: {'initialIndex': 1},
-                        );
+                        // 뒤로가기 후 검색 탭(1번)으로 이동
+                        Get.back();
+                        Get.find<MainController>().currentIndex.value = 1;
                       },
                       icon: const Icon(Icons.search),
                       label: const Text('곡 찾아보기'),
