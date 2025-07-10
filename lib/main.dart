@@ -13,6 +13,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'firebase_options.dart';
 import 'app/routes/app_pages.dart';
 import 'app/data/constants/app_colors.dart';
+import 'app/modules/webview/controllers/webview_controller.dart';
 
 SimplePip? pip;
 
@@ -79,8 +80,67 @@ class MyTrayListener with TrayListener {
     print('시스템 트레이 아이콘 클릭됨');
     // 좌클릭 시 창을 표시
     print('좌클릭으로 창 표시 시도...');
-    await windowManager.show();
-    await windowManager.focus();
+    await _showAndFocusWindow();
+  }
+
+  // 창 표시 및 포커스 설정을 위한 헬퍼 메서드
+  Future<void> _showAndFocusWindow() async {
+    try {
+      // 창이 숨겨져 있는지 확인
+      final isVisible = await windowManager.isVisible();
+      print('창 가시성 상태: $isVisible');
+
+      if (!isVisible) {
+        // 창 표시
+        await windowManager.show();
+        print('창 표시 완료');
+
+        // 잠시 대기 후 포커스 설정
+        await Future.delayed(const Duration(milliseconds: 100));
+        await windowManager.focus();
+        print('창 포커스 설정 완료');
+
+        // 추가로 포커스 강화
+        await Future.delayed(const Duration(milliseconds: 50));
+        await windowManager.focus();
+
+        // 창을 최상위로 가져오기
+        await windowManager.setAlwaysOnTop(true);
+        await Future.delayed(const Duration(milliseconds: 50));
+        await windowManager.setAlwaysOnTop(false);
+
+        // 웹뷰 포커스 복구
+        await _restoreWebViewFocus();
+
+        print('창 복원 완료');
+      } else {
+        // 이미 보이는 경우 포커스만 설정
+        await windowManager.focus();
+        print('기존 창에 포커스 설정');
+
+        // 웹뷰 포커스 복구
+        await _restoreWebViewFocus();
+      }
+    } catch (e) {
+      print('창 표시/포커스 설정 실패: $e');
+    }
+  }
+
+  // 웹뷰 포커스 복구
+  Future<void> _restoreWebViewFocus() async {
+    try {
+      // 잠시 대기 후 웹뷰 포커스 복구
+      await Future.delayed(const Duration(milliseconds: 300));
+
+      // 웹뷰 컨트롤러가 등록되어 있는지 확인
+      if (Get.isRegistered<AppWebViewController>()) {
+        final webViewController = Get.find<AppWebViewController>();
+        await webViewController.restoreWebViewFocus();
+        print('웹뷰 포커스 복구 완료');
+      }
+    } catch (e) {
+      print('웹뷰 포커스 복구 실패: $e');
+    }
   }
 
   @override
@@ -97,8 +157,7 @@ class MyTrayListener with TrayListener {
     switch (menuItem.key) {
       case 'show':
         print('창 열기 실행');
-        await windowManager.show();
-        await windowManager.focus();
+        await _showAndFocusWindow();
         break;
       case 'exit':
         print('앱 종료 실행');
@@ -158,6 +217,44 @@ class _MyAppState extends State<MyApp> with WindowListener {
       if (isPrevented) {
         await windowManager.hide();
       }
+    }
+  }
+
+  @override
+  void onWindowShow() async {
+    if (!kIsWeb && Platform.isWindows) {
+      print('윈도우 표시 이벤트 발생');
+      // 창이 표시될 때 포커스 강화
+      await Future.delayed(const Duration(milliseconds: 100));
+      await windowManager.focus();
+      print('윈도우 표시 후 포커스 설정 완료');
+
+      // 웹뷰 포커스 복구
+      await _restoreWebViewFocus();
+    }
+  }
+
+  @override
+  void onWindowFocus() async {
+    if (!kIsWeb && Platform.isWindows) {
+      print('윈도우 포커스 이벤트 발생');
+    }
+  }
+
+  // 웹뷰 포커스 복구 (MyAppState용)
+  Future<void> _restoreWebViewFocus() async {
+    try {
+      // 잠시 대기 후 웹뷰 포커스 복구
+      await Future.delayed(const Duration(milliseconds: 300));
+
+      // 웹뷰 컨트롤러가 등록되어 있는지 확인
+      if (Get.isRegistered<AppWebViewController>()) {
+        final webViewController = Get.find<AppWebViewController>();
+        await webViewController.restoreWebViewFocus();
+        print('웹뷰 포커스 복구 완료');
+      }
+    } catch (e) {
+      print('웹뷰 포커스 복구 실패: $e');
     }
   }
 

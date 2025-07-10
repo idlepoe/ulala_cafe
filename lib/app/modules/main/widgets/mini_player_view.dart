@@ -154,96 +154,93 @@ class MiniPlayerView extends GetView<MiniPlayerController> {
             : const SizedBox.shrink(),
       );
 
-      // 웹에서 키보드 단축키 기능 추가
-      if (kIsWeb) {
-        return Focus(
-          autofocus: true,
-          onKeyEvent: (node, event) {
-            return controller.handleKeyboardShortcut(event)
-                ? KeyEventResult.handled
-                : KeyEventResult.ignored;
-          },
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              miniPlayer,
-              // 키보드 단축키 정보 표시 (Toss 스타일)
-              if (controller.showKeyboardShortcuts.value &&
-                  controller.isPlayerVisible.value)
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 12,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF8F9FA),
-                    border: Border(
-                      top: BorderSide(color: const Color(0xFFE9ECEF), width: 1),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF3182F6).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: const Text('💡', style: TextStyle(fontSize: 12)),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              '키보드 단축키',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF191F28),
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            const Text(
-                              '스페이스바: 재생/일시정지 • ↑↓: 이전/다음 곡 • ESC: 닫기 • H: 도움말 토글',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: Color(0xFF8B95A1),
-                                height: 1.3,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: controller.toggleKeyboardShortcuts,
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF1F3F4),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: const Icon(
-                            Icons.close,
-                            size: 16,
-                            color: Color(0xFF8B95A1),
-                          ),
-                        ),
-                      ),
-                    ],
+      // 키보드 단축키 기능 추가
+      return Focus(
+        autofocus: true,
+        onKeyEvent: (node, event) {
+          return controller.handleKeyboardShortcut(event)
+              ? KeyEventResult.handled
+              : KeyEventResult.ignored;
+        },
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            miniPlayer,
+            // 키보드 단축키 정보 표시 (Toss 스타일) - 웹에서만
+            if (kIsWeb &&
+                controller.showKeyboardShortcuts.value &&
+                controller.isPlayerVisible.value)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8F9FA),
+                  border: Border(
+                    top: BorderSide(color: const Color(0xFFE9ECEF), width: 1),
                   ),
                 ),
-            ],
-          ),
-        );
-      }
-
-      return miniPlayer;
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF3182F6).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Text('💡', style: TextStyle(fontSize: 12)),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            '키보드 단축키',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF191F28),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            '스페이스바: 재생/일시정지 • ←→: 이전/다음 곡 • ESC: 닫기 • H: 도움말 토글',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Color(0xFF8B95A1),
+                              height: 1.3,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: controller.toggleKeyboardShortcuts,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF1F3F4),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Icon(
+                          Icons.close,
+                          size: 16,
+                          color: Color(0xFF8B95A1),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ),
+      );
     });
   }
 

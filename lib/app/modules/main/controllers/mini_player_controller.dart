@@ -195,9 +195,9 @@ class MiniPlayerController extends GetxController {
     youtubeController.seekTo(seconds: seconds);
   }
 
-  /// 키보드 단축키 처리 (웹 전용)
+  /// 키보드 단축키 처리
   bool handleKeyboardShortcut(KeyEvent event) {
-    if (!kIsWeb || !isPlayerVisible.value) return false;
+    if (!isPlayerVisible.value) return false;
 
     if (event is KeyDownEvent) {
       switch (event.logicalKey) {
