@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'dart:io';
 
 import 'package:get/get.dart';
 import 'package:simple_pip_mode/simple_pip.dart';
@@ -6,6 +7,7 @@ import 'package:ulala_cafe/app/data/utils/logger.dart';
 import 'package:ulala_cafe/main.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart';
 import '../../../data/models/youtube_track_model.dart';
 import '../../../data/providers/ranking_provider.dart';
 
@@ -74,11 +76,13 @@ class MiniPlayerController extends GetxController {
 
       progressPercentage.value = position / duration;
 
-      // autoPipMode 관리 - 재생 중이고 플레이어가 보일 때만 활성화
-      if (isPlaying.value && isPlayerVisible.value) {
-        _enableAutoPipMode();
-      } else {
-        _disableAutoPipMode();
+      // autoPipMode 관리 - 재생 중이고 플레이어가 보일 때만 활성화 (Windows 제외)
+      if (!kIsWeb && !Platform.isWindows) {
+        if (isPlaying.value && isPlayerVisible.value) {
+          _enableAutoPipMode();
+        } else {
+          _disableAutoPipMode();
+        }
       }
 
       // 재생이 종료되었는지 확인
@@ -254,8 +258,10 @@ class MiniPlayerController extends GetxController {
     currentIndex.value = 0;
     isShuffleMode.value = false;
 
-    // 플레이어를 숨길 때 PiP 모드 비활성화
-    _disableAutoPipMode();
+    // 플레이어를 숨길 때 PiP 모드 비활성화 (Windows 제외)
+    if (!kIsWeb && !Platform.isWindows) {
+      _disableAutoPipMode();
+    }
   }
 
   void seekTo(double seconds) {
@@ -266,8 +272,10 @@ class MiniPlayerController extends GetxController {
 
   @override
   void onClose() {
-    // PiP 모드 비활성화
-    _disableAutoPipMode();
+    // PiP 모드 비활성화 (Windows 제외)
+    if (!kIsWeb && !Platform.isWindows) {
+      _disableAutoPipMode();
+    }
 
     youtubeController.removeListener(_playerListener);
     youtubeController.dispose();
@@ -285,6 +293,12 @@ class MiniPlayerController extends GetxController {
 
   /// PiP 초기화 (autoPipMode 관리용)
   Future<void> _initPip() async {
+    // Windows 플랫폼에서는 PiP 모드를 지원하지 않으므로 초기화하지 않음
+    if (kIsWeb || Platform.isWindows) {
+      logger.i('PiP not supported on Windows/Web platform');
+      return;
+    }
+
     try {
       bool isPipSupported = await SimplePip.isPipAvailable;
       logger.i('PiP Support for autoPipMode: $isPipSupported');
@@ -299,6 +313,11 @@ class MiniPlayerController extends GetxController {
 
   /// AutoPipMode 활성화 (재생 중일 때)
   Future<void> _enableAutoPipMode() async {
+    // Windows 플랫폼에서는 PiP 모드를 지원하지 않으므로 활성화하지 않음
+    if (kIsWeb || Platform.isWindows) {
+      return;
+    }
+
     if (_pip != null && isPlaying.value && isPlayerVisible.value) {
       try {
         await _pip!.setAutoPipMode();
@@ -311,6 +330,11 @@ class MiniPlayerController extends GetxController {
 
   /// AutoPipMode 비활성화 (재생 중이 아닐 때)
   Future<void> _disableAutoPipMode() async {
+    // Windows 플랫폼에서는 PiP 모드를 지원하지 않으므로 비활성화하지 않음
+    if (kIsWeb || Platform.isWindows) {
+      return;
+    }
+
     if (_pip != null) {
       try {
         // simple_pip_mode에서 autoPipMode를 비활성화하는 직접적인 방법이 없으므로
@@ -325,6 +349,12 @@ class MiniPlayerController extends GetxController {
 
   /// 앱 생명주기 리스너 설정
   void _setupAppLifecycleListener() {
+    // Windows 플랫폼에서는 PiP 모드를 지원하지 않으므로 리스너를 설정하지 않음
+    if (kIsWeb || Platform.isWindows) {
+      logger.i('PiP lifecycle listener not set on Windows/Web platform');
+      return;
+    }
+
     WidgetsBinding.instance.addObserver(
       LifecycleEventHandler(
         detachedCallBack: () async {

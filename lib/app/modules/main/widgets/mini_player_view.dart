@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:flutter/foundation.dart';
+import 'dart:io';
 import '../controllers/mini_player_controller.dart';
 import '../../../data/constants/app_colors.dart';
 import '../../../data/constants/app_sizes.dart';
@@ -15,11 +17,7 @@ class MiniPlayerView extends GetView<MiniPlayerController> {
       return AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
-        height:
-            controller.isPlayerVisible.value &&
-                !controller.isPipModeActive.value
-            ? 80
-            : 0,
+        height: controller.isPlayerVisible.value ? 80 : 0,
         child: controller.isPlayerVisible.value
             ? Stack(
                 children: [
