@@ -33,3 +33,4 @@ doc/api/
 # env files
 .env
 functions/.env
+/certs/my_cert.pfx

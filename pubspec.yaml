@@ -33,6 +33,7 @@ dependencies:
   window_manager: ^0.5.0
   tray_manager: ^0.5.0
   google_fonts: ^6.2.1
+  msix: ^3.16.9
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -56,7 +57,7 @@ flutter_launcher_icons:
     theme_color: "#f8e8fd"
   windows:
     generate: true
-    image_path: "assets/icon/icon.png"
+    image_path: "assets/icon/icon-removebg.ico"
     background_color: "#f8e8fd"
     theme_color: "#f8e8fd"
 flutter_native_splash:
@@ -66,3 +67,14 @@ flutter_native_splash:
     image: assets/icon/icon.png
     color: "#f8e8fd"
   web: true
+msix_config:
+  display_name: "울랄라 카페 - 함께 듣고, 함께 즐기는 음악 카페"
+  publisher_display_name: "이제영"
+  identity_name: 8C13C29F.-
+  publisher: CN=E6E0CA64-5693-4B23-9A95-DF94678405F8
+  msix_version: 1.0.1.0
+  logo_path: assets/icon/icon-removebg.ico
+  architecture: x64
+  capabilities: internetClient
+  certificate_path: certs/my_cert.pfx
+  certificate_password: 512608
