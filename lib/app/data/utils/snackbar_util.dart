@@ -11,7 +11,7 @@ class SnackbarUtil {
     String message, {
     String? title,
     SnackbarType type = SnackbarType.info,
-    Duration duration = const Duration(seconds: 3),
+    Duration duration = const Duration(seconds: 2),
   }) {
     Color backgroundColor;
     Color textColor = Colors.white;
@@ -47,15 +47,21 @@ class SnackbarUtil {
       margin: EdgeInsets.only(
         left: AppSizes.paddingM,
         right: AppSizes.paddingM,
-        bottom: 100, // 네비게이션바 높이만큼 여유 공간 확보
+        bottom: 120, // 네비게이션바와 미니플레이어 높이를 고려하여 여유 공간 확보
       ),
       borderRadius: AppSizes.radiusM,
       icon: Icon(icon, color: textColor, size: AppSizes.iconM),
       shouldIconPulse: false,
-      animationDuration: const Duration(milliseconds: 300),
-      forwardAnimationCurve: Curves.easeOutBack,
-      reverseAnimationCurve: Curves.easeInBack,
+      animationDuration: const Duration(milliseconds: 200),
+      forwardAnimationCurve: Curves.easeOut,
+      reverseAnimationCurve: Curves.easeIn,
       snackStyle: SnackStyle.FLOATING,
+      isDismissible: true, // 스와이프로 닫을 수 있도록 설정
+      dismissDirection: DismissDirection.horizontal, // 좌우 스와이프로 닫기
+      overlayBlur: 0, // 오버레이 블러 제거
+      overlayColor: Colors.transparent, // 오버레이 색상 투명하게 설정
+      barBlur: 0, // 스낵바 블러 제거
+      maxWidth: 400, // 최대 너비 제한으로 네비게이션 영역 확보
     );
   }
 
@@ -79,7 +85,7 @@ class SnackbarUtil {
       message,
       title: title,
       type: SnackbarType.success,
-      duration: duration ?? const Duration(seconds: 3),
+      duration: duration ?? const Duration(seconds: 2),
     );
   }
 
@@ -88,7 +94,7 @@ class SnackbarUtil {
       message,
       title: title,
       type: SnackbarType.error,
-      duration: duration ?? const Duration(seconds: 3),
+      duration: duration ?? const Duration(seconds: 2),
     );
   }
 
@@ -97,7 +103,7 @@ class SnackbarUtil {
       message,
       title: title,
       type: SnackbarType.warning,
-      duration: duration ?? const Duration(seconds: 3),
+      duration: duration ?? const Duration(seconds: 2),
     );
   }
 
@@ -106,7 +112,7 @@ class SnackbarUtil {
       message,
       title: title,
       type: SnackbarType.info,
-      duration: duration ?? const Duration(seconds: 3),
+      duration: duration ?? const Duration(seconds: 2),
     );
   }
 }

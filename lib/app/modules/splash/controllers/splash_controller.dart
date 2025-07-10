@@ -5,6 +5,8 @@ import 'package:ulala_cafe/app/routes/app_pages.dart';
 import 'package:ulala_cafe/app/data/utils/logger.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ulala_cafe/app/data/utils/snackbar_util.dart';
+import 'package:flutter/foundation.dart';
+import 'dart:io';
 
 class SplashController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -49,8 +51,14 @@ class SplashController extends GetxController {
       // 로그인 상태 재확인
       final userCheck = _auth.currentUser;
       if (userCheck != null) {
-        logger.i('✅ 인증 완료, main 화면으로 이동');
-        Get.offAllNamed(Routes.MAIN);
+        // Windows 플랫폼인 경우 웹뷰로 이동, 그 외에는 메인 화면으로 이동
+        if (!kIsWeb && Platform.isWindows) {
+          logger.i('✅ 인증 완료, Windows 플랫폼 - 웹뷰 화면으로 이동');
+          Get.offAllNamed(Routes.WEBVIEW);
+        } else {
+          logger.i('✅ 인증 완료, main 화면으로 이동');
+          Get.offAllNamed(Routes.MAIN);
+        }
       } else {
         logger.e('❌ 인증 상태 확인 실패');
         _showAuthError();

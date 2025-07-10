@@ -19,7 +19,7 @@ dependencies:
   cloud_firestore: ^5.6.11
   firebase_storage: ^12.3.5
   firebase_database: ^11.1.5
-  youtube_player_flutter: ^9.1.1
+  youtube_player_iframe: ^5.2.0
   shared_preferences: ^2.2.2
   image_picker: ^1.0.4
   intl: ^0.19.0
@@ -29,6 +29,8 @@ dependencies:
   simple_pip_mode: ^1.1.0
   flutter_launcher_icons: ^0.14.4
   flutter_native_splash: ^2.4.4
+  flutter_inappwebview: ^6.0.0
+  window_manager: ^0.5.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

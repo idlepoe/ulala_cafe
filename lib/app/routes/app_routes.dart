@@ -12,6 +12,7 @@ abstract class Routes {
   static const TAB_CAFE = '/tab-cafe';
   static const PLAY_LIST = '/play-list';
   static const SETTING = _Paths.SETTING;
+  static const WEBVIEW = '/webview';
 }
 
 abstract class _Paths {
@@ -20,4 +21,5 @@ abstract class _Paths {
   static const MAIN = '/main';
   static const PLAY_LIST = '/play-list';
   static const SETTING = '/setting';
+  static const WEBVIEW = '/webview';
 }

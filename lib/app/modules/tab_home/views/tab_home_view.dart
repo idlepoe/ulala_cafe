@@ -13,23 +13,27 @@ import '../../tab_search/widgets/playlist_selector_dialog.dart';
 class TabHomeView extends GetView<TabHomeController> {
   const TabHomeView({super.key});
 
+  PreferredSizeWidget _buildAppBar() {
+    return AppBar(
+      title: Text('홈', style: AppTextStyles.h1),
+      backgroundColor: AppColors.background,
+      elevation: 0,
+      iconTheme: const IconThemeData(color: AppColors.primary),
+      actions: [
+        IconButton(
+          onPressed: () => Get.toNamed(Routes.SETTING),
+          icon: const Icon(Icons.settings),
+          color: AppColors.primary,
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text('홈', style: AppTextStyles.h1),
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: AppColors.primary),
-        actions: [
-          IconButton(
-            onPressed: () => Get.toNamed(Routes.SETTING),
-            icon: const Icon(Icons.settings),
-            color: AppColors.primary,
-          ),
-        ],
-      ),
+      appBar: _buildAppBar(),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(AppSizes.paddingL),
         child: Column(

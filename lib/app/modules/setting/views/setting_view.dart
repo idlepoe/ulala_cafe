@@ -10,6 +10,7 @@ import '../controllers/setting_controller.dart';
 
 class SettingView extends GetView<SettingController> {
   const SettingView({super.key});
+
   Future<void> _showResetDataDialog(BuildContext context) async {
     return showDialog(
       context: context,

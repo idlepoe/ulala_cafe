@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../tab_home/views/tab_home_view.dart';
 import '../../tab_search/views/tab_search_view.dart';
 import '../../tab_library/views/tab_library_view.dart';
@@ -8,6 +9,9 @@ import '../../tab_library/controllers/tab_library_controller.dart';
 
 class MainController extends GetxController {
   final currentIndex = 0.obs;
+  final isDenseNavigation = false.obs; // dense 네비게이션 모드 상태
+
+  static const String _denseNavigationKey = 'is_dense_navigation';
 
   final List<Widget> pages = [
     const TabHomeView(),
@@ -42,6 +46,36 @@ class MainController extends GetxController {
     if (index == 2 && Get.isRegistered<TabLibraryController>()) {
       final libraryController = Get.find<TabLibraryController>();
       libraryController.loadPlaylists();
+    }
+  }
+
+  @override
+  void onInit() {
+    super.onInit();
+    _loadDenseNavigationState();
+  }
+
+  void toggleDenseNavigation() async {
+    isDenseNavigation.value = !isDenseNavigation.value;
+    await _saveDenseNavigationState();
+  }
+
+  Future<void> _loadDenseNavigationState() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      isDenseNavigation.value = prefs.getBool(_denseNavigationKey) ?? false;
+    } catch (e) {
+      // 에러 발생 시 기본값 사용
+      isDenseNavigation.value = false;
+    }
+  }
+
+  Future<void> _saveDenseNavigationState() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(_denseNavigationKey, isDenseNavigation.value);
+    } catch (e) {
+      // 에러 발생 시 무시
     }
   }
 }

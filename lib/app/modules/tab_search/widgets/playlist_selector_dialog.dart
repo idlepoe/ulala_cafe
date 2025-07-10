@@ -26,6 +26,15 @@ class _PlaylistSelectorDialogState extends State<PlaylistSelectorDialog> {
   bool _isLoading = false;
 
   @override
+  void initState() {
+    super.initState();
+    // 첫 번째 플레이리스트를 기본값으로 선택
+    if (_playlistProvider.playlists.isNotEmpty) {
+      _selectedPlaylistIds.add(_playlistProvider.playlists.first.id);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: AppColors.surface,

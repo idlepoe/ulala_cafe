@@ -18,6 +18,8 @@ import '../modules/tab_library/bindings/tab_library_binding.dart';
 import '../modules/tab_library/views/tab_library_view.dart';
 import '../modules/tab_search/bindings/tab_search_binding.dart';
 import '../modules/tab_search/views/tab_search_view.dart';
+import '../modules/webview/bindings/webview_binding.dart';
+import '../modules/webview/views/webview_view.dart';
 
 part 'app_routes.dart';
 
@@ -71,6 +73,11 @@ class AppPages {
       name: _Paths.SETTING,
       page: () => const SettingView(),
       binding: SettingBinding(),
+    ),
+    GetPage(
+      name: Routes.WEBVIEW,
+      page: () => const WebViewView(),
+      binding: WebViewBinding(),
     ),
   ];
 }

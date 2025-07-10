@@ -62,13 +62,17 @@ class MainView extends GetView<MainController> {
                   ),
                   child: SafeArea(
                     child: Container(
-                      height: AppSizes.bottomNavHeight,
+                      height: controller.isDenseNavigation.value
+                          ? AppSizes.bottomNavHeight * 0.6
+                          : AppSizes.bottomNavHeight,
                       child: Row(
                         children: [
                           _buildNavItem(0, Icons.home, '홈'),
                           _buildNavItem(1, Icons.search, '검색'),
                           _buildNavItem(2, Icons.library_music, '라이브러리'),
                           _buildNavItem(3, Icons.coffee, 'CAFE'),
+                          // Dense 모드 toggle 버튼
+                          _buildDenseToggleButton(),
                         ],
                       ),
                     ),
@@ -90,21 +94,60 @@ class MainView extends GetView<MainController> {
           onTap: () => controller.changePage(index),
           behavior: HitTestBehavior.opaque,
           child: Container(
-            height: AppSizes.bottomNavHeight,
+            height: controller.isDenseNavigation.value
+                ? AppSizes.bottomNavHeight * 0.6
+                : AppSizes.bottomNavHeight,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
                   icon,
                   color: isSelected ? AppColors.primary : AppColors.inactive,
-                  size: AppSizes.iconM,
+                  size: controller.isDenseNavigation.value
+                      ? AppSizes.iconS
+                      : AppSizes.iconM,
                 ),
-                SizedBox(height: AppSizes.spacingXS),
-                Text(
-                  label,
-                  style: AppTextStyles.caption.copyWith(
-                    color: isSelected ? AppColors.primary : AppColors.inactive,
+                if (!controller.isDenseNavigation.value) ...[
+                  SizedBox(height: AppSizes.spacingXS),
+                  Text(
+                    label,
+                    style: AppTextStyles.caption.copyWith(
+                      color: isSelected
+                          ? AppColors.primary
+                          : AppColors.inactive,
+                    ),
                   ),
+                ],
+              ],
+            ),
+          ),
+        );
+      }),
+    );
+  }
+
+  Widget _buildDenseToggleButton() {
+    return Container(
+      width: 50,
+      child: Obx(() {
+        return GestureDetector(
+          onTap: () => controller.toggleDenseNavigation(),
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            height: controller.isDenseNavigation.value
+                ? AppSizes.bottomNavHeight * 0.6
+                : AppSizes.bottomNavHeight,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  controller.isDenseNavigation.value
+                      ? Icons.expand_less
+                      : Icons.expand_more,
+                  color: AppColors.primary,
+                  size: controller.isDenseNavigation.value
+                      ? AppSizes.iconS
+                      : AppSizes.iconM,
                 ),
               ],
             ),

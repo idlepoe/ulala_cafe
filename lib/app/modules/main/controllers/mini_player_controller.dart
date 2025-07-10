@@ -5,9 +5,10 @@ import 'package:get/get.dart';
 import 'package:simple_pip_mode/simple_pip.dart';
 import 'package:ulala_cafe/app/data/utils/logger.dart';
 import 'package:ulala_cafe/main.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import '../../../data/models/youtube_track_model.dart';
 import '../../../data/providers/ranking_provider.dart';
 
@@ -36,6 +37,9 @@ class MiniPlayerController extends GetxController {
 
   final isPipModeActive = false.obs;
 
+  // 웹에서 키보드 단축키 표시용
+  final RxBool showKeyboardShortcuts = false.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -47,61 +51,15 @@ class MiniPlayerController extends GetxController {
 
     // 앱 생명주기 감지
     _setupAppLifecycleListener();
+
+    // 웹에서 키보드 단축키 표시
+    if (kIsWeb) {
+      showKeyboardShortcuts.value = true;
+    }
   }
 
   void initializeYoutubeController() {
-    youtubeController = YoutubePlayerController(
-      initialVideoId: '',
-      flags: const YoutubePlayerFlags(
-        autoPlay: false,
-        hideControls: true,
-        enableCaption: false,
-      ),
-    );
-
-    youtubeController.addListener(_playerListener);
-  }
-
-  void _playerListener() {
-    if (youtubeController.value.isReady) {
-      isPlaying.value = youtubeController.value.isPlaying;
-
-      // 진행 시간 업데이트
-      final position = youtubeController.value.position.inSeconds.toDouble();
-      final duration = youtubeController.value.metaData.duration.inSeconds
-          .toDouble();
-
-      currentPosition.value = position;
-      totalDuration.value = duration;
-
-      progressPercentage.value = position / duration;
-
-      // autoPipMode 관리 - 재생 중이고 플레이어가 보일 때만 활성화 (Windows 제외)
-      if (!kIsWeb && !Platform.isWindows) {
-        if (isPlaying.value && isPlayerVisible.value) {
-          _enableAutoPipMode();
-        } else {
-          _disableAutoPipMode();
-        }
-      }
-
-      // 재생이 종료되었는지 확인
-      if (youtubeController.value.playerState == PlayerState.ended) {
-        _handlePlaybackEnd();
-      }
-    }
-  }
-
-  void _handlePlaybackEnd() {
-    // 플레이리스트가 없거나 마지막 곡인 경우 플레이어 닫기
-    if (playlist.isEmpty || currentIndex.value >= playlist.length - 1) {
-      hidePlayer();
-    } else {
-      // 다음 곡으로 넘어가기
-      currentIndex.value++;
-      final track = playlist[currentIndex.value];
-      _updateCurrentTrack(track);
-    }
+    youtubeController = YoutubePlayerController();
   }
 
   void playVideo(
@@ -130,24 +88,9 @@ class MiniPlayerController extends GetxController {
     // 재생 시 랭킹 업데이트 (낙관적 업데이트)
     _rankingProvider.updatePlayCount(currentTrack);
 
-    if (youtubeController.value.isReady) {
-      youtubeController.load(track.videoId);
-      isPlaying.value = true;
-    } else {
-      // 컨트롤러가 준비되지 않았을 때 재초기화
-      youtubeController.dispose();
-      youtubeController = YoutubePlayerController(
-        initialVideoId: track.videoId,
-        flags: const YoutubePlayerFlags(
-          autoPlay: true,
-          hideControls: true,
-          enableCaption: false,
-        ),
-      );
-      youtubeController.addListener(_playerListener);
-      isPlaying.value = true;
-    }
-
+    // 비디오 로드 및 재생
+    youtubeController.loadVideoById(videoId: track.videoId);
+    isPlaying.value = true;
     isPlayerVisible.value = true;
   }
 
@@ -175,26 +118,22 @@ class MiniPlayerController extends GetxController {
   }
 
   void togglePlayer() {
-    if (!youtubeController.value.isReady) return;
-
-    if (youtubeController.value.isPlaying) {
-      youtubeController.pause();
+    if (isPlaying.value) {
+      youtubeController.pauseVideo();
       isPlaying.value = false;
     } else {
-      youtubeController.play();
+      youtubeController.playVideo();
       isPlaying.value = true;
     }
   }
 
   void playPlayer() {
-    if (!youtubeController.value.isReady) return;
-    youtubeController.play();
+    youtubeController.playVideo();
     isPlaying.value = true;
   }
 
   void pausePlayer() {
-    if (!youtubeController.value.isReady) return;
-    youtubeController.pause();
+    youtubeController.pauseVideo();
     isPlaying.value = false;
   }
 
@@ -230,23 +169,8 @@ class MiniPlayerController extends GetxController {
     currentVideoId.value = track.videoId;
     currentVideoTitle.value = track.title;
     currentThumbnail.value = track.thumbnail;
-
-    if (youtubeController.value.isReady) {
-      youtubeController.load(track.videoId);
-      isPlaying.value = true;
-    } else {
-      youtubeController.dispose();
-      youtubeController = YoutubePlayerController(
-        initialVideoId: track.videoId,
-        flags: const YoutubePlayerFlags(
-          autoPlay: true,
-          hideControls: true,
-          enableCaption: false,
-        ),
-      );
-      youtubeController.addListener(_playerListener);
-      isPlaying.value = true;
-    }
+    youtubeController.loadVideoById(videoId: track.videoId);
+    isPlaying.value = true;
   }
 
   void hidePlayer() {
@@ -265,8 +189,42 @@ class MiniPlayerController extends GetxController {
   }
 
   void seekTo(double seconds) {
-    if (youtubeController.value.isReady) {
-      youtubeController.seekTo(Duration(seconds: seconds.toInt()));
+    youtubeController.seekTo(seconds: seconds);
+  }
+
+  /// 키보드 단축키 처리 (웹 전용)
+  bool handleKeyboardShortcut(KeyEvent event) {
+    if (!kIsWeb || !isPlayerVisible.value) return false;
+
+    if (event is KeyDownEvent) {
+      switch (event.logicalKey) {
+        case LogicalKeyboardKey.space:
+          togglePlayer();
+          return true;
+        case LogicalKeyboardKey.arrowUp:
+          playPrevious();
+          return true;
+        case LogicalKeyboardKey.arrowDown:
+          playNext();
+          return true;
+        case LogicalKeyboardKey.escape:
+          hidePlayer();
+          return true;
+        case LogicalKeyboardKey.keyH:
+          // H 키로 키보드 단축키 도움말 토글
+          toggleKeyboardShortcuts();
+          return true;
+        default:
+          return false;
+      }
+    }
+    return false;
+  }
+
+  /// 키보드 단축키 정보 표시/숨기기 토글
+  void toggleKeyboardShortcuts() {
+    if (kIsWeb) {
+      showKeyboardShortcuts.value = !showKeyboardShortcuts.value;
     }
   }
 
@@ -277,8 +235,7 @@ class MiniPlayerController extends GetxController {
       _disableAutoPipMode();
     }
 
-    youtubeController.removeListener(_playerListener);
-    youtubeController.dispose();
+    youtubeController.close();
     super.onClose();
   }
 
@@ -307,7 +264,7 @@ class MiniPlayerController extends GetxController {
         _pip = SimplePip();
       }
     } catch (e) {
-      logger.e('PiP initialization error: $e');
+      logger.e('PiP initialization failed: $e');
     }
   }
 
@@ -321,7 +278,7 @@ class MiniPlayerController extends GetxController {
     if (_pip != null && isPlaying.value && isPlayerVisible.value) {
       try {
         await _pip!.setAutoPipMode();
-        logger.d('AutoPipMode enabled - playing and visible');
+        logger.i('AutoPipMode enabled');
       } catch (e) {
         logger.e('Failed to enable AutoPipMode: $e');
       }
@@ -337,10 +294,8 @@ class MiniPlayerController extends GetxController {
 
     if (_pip != null) {
       try {
-        // simple_pip_mode에서 autoPipMode를 비활성화하는 직접적인 방법이 없으므로
-        // 새 인스턴스를 생성하여 기본 상태로 리셋
         await _pip!.setAutoPipMode(autoEnter: false);
-        logger.d('AutoPipMode disabled - not playing or hidden');
+        logger.i('AutoPipMode disabled');
       } catch (e) {
         logger.e('Failed to disable AutoPipMode: $e');
       }
@@ -357,21 +312,17 @@ class MiniPlayerController extends GetxController {
 
     WidgetsBinding.instance.addObserver(
       LifecycleEventHandler(
-        detachedCallBack: () async {
-          // 앱이 완전히 종료될 때 PiP 모드 비활성화
-          logger.d('App detached - disabling PiP mode');
-          await _disableAutoPipMode();
-        },
-        pausedCallBack: () async {
-          // 앱이 백그라운드로 갈 때 재생 중이 아니면 PiP 모드 비활성화
-          if (!isPlaying.value) {
-            logger.d('App paused and not playing - disabling PiP mode');
-            await _disableAutoPipMode();
+        resumeCallBack: () async {
+          if (isPipModeActive.value) {
+            isPipModeActive.value = false;
+            isPlayerVisible.value = true;
           }
         },
-        resumedCallBack: () async {
-          // 앱이 포그라운드로 돌아올 때 상태 확인
-          logger.d('App resumed - checking PiP mode');
+        suspendingCallBack: () async {
+          if (isPlayerVisible.value && isPlaying.value) {
+            isPipModeActive.value = true;
+            isPlayerVisible.value = false;
+          }
         },
       ),
     );
@@ -380,27 +331,19 @@ class MiniPlayerController extends GetxController {
 
 /// 앱 생명주기 이벤트 핸들러
 class LifecycleEventHandler extends WidgetsBindingObserver {
-  final Future<void> Function()? detachedCallBack;
-  final Future<void> Function()? pausedCallBack;
-  final Future<void> Function()? resumedCallBack;
+  final Future<void> Function()? resumeCallBack;
+  final Future<void> Function()? suspendingCallBack;
 
-  LifecycleEventHandler({
-    this.detachedCallBack,
-    this.pausedCallBack,
-    this.resumedCallBack,
-  });
+  LifecycleEventHandler({this.resumeCallBack, this.suspendingCallBack});
 
   @override
   Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
     switch (state) {
-      case AppLifecycleState.detached:
-        if (detachedCallBack != null) await detachedCallBack!();
+      case AppLifecycleState.resumed:
+        if (resumeCallBack != null) await resumeCallBack!();
         break;
       case AppLifecycleState.paused:
-        if (pausedCallBack != null) await pausedCallBack!();
-        break;
-      case AppLifecycleState.resumed:
-        if (resumedCallBack != null) await resumedCallBack!();
+        if (suspendingCallBack != null) await suspendingCallBack!();
         break;
       default:
         break;
