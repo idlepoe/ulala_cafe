@@ -141,9 +141,9 @@ class RankingProvider extends GetxService {
       return bCount.compareTo(aCount);
     });
 
-    // 상위 5개만 유지
-    if (rankingList.length > 5) {
-      rankingList.removeRange(5, rankingList.length);
+    // 상위 30개만 유지
+    if (rankingList.length > 30) {
+      rankingList.removeRange(30, rankingList.length);
     }
   }
 
@@ -199,9 +199,9 @@ class RankingProvider extends GetxService {
             (b.dailyCounts[today] ?? 0).compareTo(a.dailyCounts[today] ?? 0),
       );
 
-      // 상위 5개만 유지
-      if (rankings.length > 5) {
-        rankings.removeRange(5, rankings.length);
+      // 상위 30개만 유지
+      if (rankings.length > 30) {
+        rankings.removeRange(30, rankings.length);
       }
 
       dailyRankings.value = rankings;
@@ -250,9 +250,9 @@ class RankingProvider extends GetxService {
         ),
       );
 
-      // 상위 5개만 유지
-      if (rankings.length > 5) {
-        rankings.removeRange(5, rankings.length);
+      // 상위 30개만 유지
+      if (rankings.length > 30) {
+        rankings.removeRange(30, rankings.length);
       }
 
       weeklyRankings.value = rankings;
@@ -301,9 +301,9 @@ class RankingProvider extends GetxService {
         ),
       );
 
-      // 상위 5개만 유지
-      if (rankings.length > 5) {
-        rankings.removeRange(5, rankings.length);
+      // 상위 30개만 유지
+      if (rankings.length > 30) {
+        rankings.removeRange(30, rankings.length);
       }
 
       monthlyRankings.value = rankings;

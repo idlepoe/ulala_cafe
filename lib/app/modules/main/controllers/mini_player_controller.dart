@@ -46,15 +46,18 @@ class MiniPlayerController extends GetxController {
     initializeYoutubeController();
     _rankingProvider = Get.put(RankingProvider());
 
-    // pip 초기화
-    _initPip();
-
-    // 앱 생명주기 감지
-    _setupAppLifecycleListener();
-
     // 웹에서 키보드 단축키 표시
     if (kIsWeb) {
       showKeyboardShortcuts.value = true;
+    }
+
+    // pip 초기화 (웹이 아닌 경우에만)
+    if (!kIsWeb) {
+      _initPip();
+      // 앱 생명주기 감지 (웹이 아닌 경우에만)
+      _setupAppLifecycleListener();
+    } else {
+      logger.i('PiP and lifecycle listener skipped on web platform');
     }
   }
 
@@ -201,10 +204,10 @@ class MiniPlayerController extends GetxController {
         case LogicalKeyboardKey.space:
           togglePlayer();
           return true;
-        case LogicalKeyboardKey.arrowUp:
+        case LogicalKeyboardKey.arrowLeft:
           playPrevious();
           return true;
-        case LogicalKeyboardKey.arrowDown:
+        case LogicalKeyboardKey.arrowRight:
           playNext();
           return true;
         case LogicalKeyboardKey.escape:
@@ -230,12 +233,21 @@ class MiniPlayerController extends GetxController {
 
   @override
   void onClose() {
-    // PiP 모드 비활성화 (Windows 제외)
+    // PiP 모드 비활성화 (웹과 Windows 제외)
     if (!kIsWeb && !Platform.isWindows) {
-      _disableAutoPipMode();
+      try {
+        _disableAutoPipMode();
+      } catch (e) {
+        logger.w('PiP disable failed during close: $e');
+      }
     }
 
-    youtubeController.close();
+    try {
+      youtubeController.close();
+    } catch (e) {
+      logger.w('YouTube controller close failed: $e');
+    }
+
     super.onClose();
   }
 
@@ -250,18 +262,26 @@ class MiniPlayerController extends GetxController {
 
   /// PiP 초기화 (autoPipMode 관리용)
   Future<void> _initPip() async {
-    // Windows 플랫폼에서는 PiP 모드를 지원하지 않으므로 초기화하지 않음
+    // 웹과 Windows 플랫폼에서는 PiP 모드를 지원하지 않으므로 초기화하지 않음
     if (kIsWeb || Platform.isWindows) {
       logger.i('PiP not supported on Windows/Web platform');
       return;
     }
 
     try {
-      bool isPipSupported = await SimplePip.isPipAvailable;
-      logger.i('PiP Support for autoPipMode: $isPipSupported');
+      // SimplePip 플러그인이 사용 가능한지 먼저 확인
+      bool isPipSupported = false;
+      try {
+        isPipSupported = await SimplePip.isPipAvailable;
+        logger.i('PiP Support for autoPipMode: $isPipSupported');
+      } catch (e) {
+        logger.w('PiP availability check failed: $e');
+        return;
+      }
 
       if (isPipSupported) {
         _pip = SimplePip();
+        logger.i('PiP instance created successfully');
       }
     } catch (e) {
       logger.e('PiP initialization failed: $e');
@@ -270,7 +290,7 @@ class MiniPlayerController extends GetxController {
 
   /// AutoPipMode 활성화 (재생 중일 때)
   Future<void> _enableAutoPipMode() async {
-    // Windows 플랫폼에서는 PiP 모드를 지원하지 않으므로 활성화하지 않음
+    // 웹과 Windows 플랫폼에서는 PiP 모드를 지원하지 않으므로 활성화하지 않음
     if (kIsWeb || Platform.isWindows) {
       return;
     }
@@ -287,7 +307,7 @@ class MiniPlayerController extends GetxController {
 
   /// AutoPipMode 비활성화 (재생 중이 아닐 때)
   Future<void> _disableAutoPipMode() async {
-    // Windows 플랫폼에서는 PiP 모드를 지원하지 않으므로 비활성화하지 않음
+    // 웹과 Windows 플랫폼에서는 PiP 모드를 지원하지 않으므로 비활성화하지 않음
     if (kIsWeb || Platform.isWindows) {
       return;
     }
@@ -304,7 +324,7 @@ class MiniPlayerController extends GetxController {
 
   /// 앱 생명주기 리스너 설정
   void _setupAppLifecycleListener() {
-    // Windows 플랫폼에서는 PiP 모드를 지원하지 않으므로 리스너를 설정하지 않음
+    // 웹과 Windows 플랫폼에서는 PiP 모드를 지원하지 않으므로 리스너를 설정하지 않음
     if (kIsWeb || Platform.isWindows) {
       logger.i('PiP lifecycle listener not set on Windows/Web platform');
       return;

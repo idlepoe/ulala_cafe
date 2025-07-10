@@ -9,6 +9,7 @@ import '../../../data/constants/app_sizes.dart';
 import '../../../data/constants/app_text_styles.dart';
 import '../../main/controllers/mini_player_controller.dart';
 import '../../tab_search/widgets/playlist_selector_dialog.dart';
+import '../../../data/models/youtube_track_model.dart';
 
 class TabHomeView extends GetView<TabHomeController> {
   const TabHomeView({super.key});
@@ -242,7 +243,41 @@ class TabHomeView extends GetView<TabHomeController> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: AppTextStyles.h4),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(title, style: AppTextStyles.h4),
+            if (tracks.isNotEmpty)
+              ElevatedButton.icon(
+                onPressed: () => _playAllTracks(title, tracks),
+                icon: Icon(
+                  Icons.play_arrow,
+                  size: 16,
+                  color: AppColors.surface,
+                ),
+                label: Text(
+                  '전체 재생',
+                  style: AppTextStyles.body3.copyWith(
+                    color: AppColors.surface,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: AppColors.surface,
+                  elevation: 0,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppSizes.radiusS),
+                  ),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppSizes.paddingM,
+                    vertical: AppSizes.paddingS,
+                  ),
+                ),
+              ),
+          ],
+        ),
         SizedBox(height: AppSizes.marginM),
 
         if (tracks.isEmpty)
@@ -448,6 +483,35 @@ class TabHomeView extends GetView<TabHomeController> {
       Get.snackbar(
         '재생 오류',
         '음악을 재생할 수 없습니다.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
+  void _playAllTracks(String title, List<dynamic> tracks) {
+    try {
+      final tracksList = tracks.cast<YoutubeTrack>();
+
+      if (title.contains('오늘의')) {
+        controller.playAllDailyRankings();
+      } else if (title.contains('이번 주')) {
+        controller.playAllWeeklyRankings();
+      } else if (title.contains('이번 달')) {
+        controller.playAllMonthlyRankings();
+      }
+
+      Get.snackbar(
+        '재생 시작',
+        '$title 전체 재생 (${tracksList.length}개 트랙)',
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(seconds: 2),
+        backgroundColor: AppColors.primary,
+        colorText: AppColors.surface,
+      );
+    } catch (e) {
+      Get.snackbar(
+        '재생 오류',
+        '전체 재생을 시작할 수 없습니다.',
         snackPosition: SnackPosition.BOTTOM,
       );
     }

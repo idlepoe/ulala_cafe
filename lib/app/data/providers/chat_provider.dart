@@ -25,14 +25,18 @@ class ChatProvider extends GetxService {
   @override
   void onInit() {
     super.onInit();
+    logger.d('=== ChatProvider 초기화 시작 ===');
     _listenToMessages();
     _trackUserPresence();
+    logger.d('=== ChatProvider 초기화 완료 ===');
   }
 
   @override
   void onClose() {
+    logger.d('=== ChatProvider 종료 시작 ===');
     _removeUserPresence();
     super.onClose();
+    logger.d('=== ChatProvider 종료 완료 ===');
   }
 
   /// 메시지 스트림 감지
@@ -133,33 +137,77 @@ class ChatProvider extends GetxService {
 
   /// 사용자 활성 상태 추적
   void _trackUserPresence() {
+    logger.d('=== 사용자 활성 상태 추적 시작 ===');
+
     final user = _auth.currentUser;
-    if (user == null) return;
+    if (user == null) {
+      logger.w('사용자가 로그인되지 않음 - 활성 상태 추적 중단');
+      return;
+    }
+
+    logger.d('사용자 정보: UID=${user.uid}, DisplayName=${user.displayName}');
 
     try {
       final userRef = _database.ref().child('$_activeUsersPath/${user.uid}');
+      logger.d('Realtime Database 경로: $_activeUsersPath/${user.uid}');
 
-      // 사용자 온라인 상태 설정
-      userRef.set({
+      final userData = {
         'displayName': user.displayName?.isNotEmpty == true
             ? user.displayName!
             : (user.uid.length >= 5 ? user.uid.substring(0, 5) : user.uid),
         'photoUrl': user.photoURL,
         'lastSeen': ServerValue.timestamp,
-      });
+      };
+
+      logger.d('사용자 데이터 설정: $userData');
+
+      // 사용자 온라인 상태 설정
+      userRef
+          .set(userData)
+          .then((_) {
+            logger.d('✅ 사용자 온라인 상태 설정 완료');
+          })
+          .catchError((error) {
+            logger.e('❌ 사용자 온라인 상태 설정 실패: $error');
+          });
 
       // 연결 해제 시 자동 제거
-      userRef.onDisconnect().remove();
+      userRef
+          .onDisconnect()
+          .remove()
+          .then((_) {
+            logger.d('✅ 연결 해제 시 자동 제거 설정 완료');
+          })
+          .catchError((error) {
+            logger.e('❌ 연결 해제 시 자동 제거 설정 실패: $error');
+          });
 
       // 활성 사용자 수 감지
-      _database.ref().child(_activeUsersPath).onValue.listen((event) {
-        final data = event.snapshot.value;
-        if (data is Map) {
-          activeUsers.value = data.length;
-        } else {
-          activeUsers.value = 0;
-        }
-      });
+      logger.d('활성 사용자 수 실시간 감지 시작');
+      _database
+          .ref()
+          .child(_activeUsersPath)
+          .onValue
+          .listen(
+            (event) {
+              final data = event.snapshot.value;
+              logger.d('활성 사용자 데이터 수신: $data');
+
+              if (data is Map) {
+                final newCount = data.length;
+                logger.d('활성 사용자 수 업데이트: ${activeUsers.value} → $newCount');
+                activeUsers.value = newCount;
+              } else {
+                logger.d('활성 사용자 수 초기화: ${activeUsers.value} → 0');
+                activeUsers.value = 0;
+              }
+            },
+            onError: (error) {
+              logger.e('활성 사용자 수 감지 오류: $error');
+            },
+          );
+
+      logger.d('=== 사용자 활성 상태 추적 설정 완료 ===');
     } catch (e) {
       logger.e('사용자 활성 상태 추적 실패: $e');
     }
@@ -167,12 +215,30 @@ class ChatProvider extends GetxService {
 
   /// 사용자 활성 상태 제거
   void _removeUserPresence() {
+    logger.d('=== 사용자 활성 상태 제거 시작 ===');
+
     final user = _auth.currentUser;
-    if (user == null) return;
+    if (user == null) {
+      logger.w('사용자가 로그인되지 않음 - 활성 상태 제거 중단');
+      return;
+    }
+
+    logger.d('사용자 정보: UID=${user.uid}, DisplayName=${user.displayName}');
 
     try {
       final userRef = _database.ref().child('$_activeUsersPath/${user.uid}');
-      userRef.remove();
+      logger.d('Realtime Database 경로: $_activeUsersPath/${user.uid}');
+
+      userRef
+          .remove()
+          .then((_) {
+            logger.d('✅ 사용자 활성 상태 제거 완료');
+          })
+          .catchError((error) {
+            logger.e('❌ 사용자 활성 상태 제거 실패: $error');
+          });
+
+      logger.d('=== 사용자 활성 상태 제거 설정 완료 ===');
     } catch (e) {
       logger.e('사용자 활성 상태 제거 실패: $e');
     }

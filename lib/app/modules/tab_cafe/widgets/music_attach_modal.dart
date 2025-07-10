@@ -8,6 +8,7 @@ import '../../../data/providers/chat_provider.dart';
 import '../../../data/utils/snackbar_util.dart';
 import '../../../data/utils/toss_loading_indicator.dart';
 import '../../../data/utils/logger.dart';
+import '../../main/controllers/main_controller.dart';
 
 class MusicAttachModal extends StatefulWidget {
   final Function(YoutubeTrack) onTrackSelected;
@@ -168,11 +169,51 @@ class _MusicAttachModalState extends State<MusicAttachModal> {
                   )
                 : _filteredTracks.isEmpty
                 ? Center(
-                    child: Text(
-                      '음악이 없습니다',
-                      style: AppTextStyles.body2.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.music_note,
+                          size: 64,
+                          color: AppColors.textSecondary.withOpacity(0.5),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          '라이브러리에 음악이 없습니다',
+                          style: AppTextStyles.body1.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            // 모달 닫기
+                            Navigator.pop(context);
+                            // 1번 탭(검색)으로 이동
+                            final mainController = Get.find<MainController>();
+                            mainController.changePage(1);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: AppColors.surface,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          icon: const Icon(Icons.add, size: 20),
+                          label: const Text(
+                            '노래 추가',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   )
                 : ListView.builder(

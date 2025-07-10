@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../widgets/profile_edit_modal.dart';
 import '../../../data/providers/chat_provider.dart';
 import '../../../data/models/chat_message_model.dart';
@@ -113,6 +114,19 @@ class TabCafeController extends GetxController {
 
     // 메시지 전송 완료 후 텍스트 필드 초기화
     messageController.clear();
+  }
+
+  // 키보드 단축키 처리
+  bool handleKeyboardShortcut(KeyEvent event) {
+    if (event is KeyDownEvent) {
+      // Alt + Enter: 메시지 전송
+      if (HardwareKeyboard.instance.isAltPressed &&
+          event.logicalKey == LogicalKeyboardKey.enter) {
+        sendTextMessage();
+        return true;
+      }
+    }
+    return false;
   }
 
   // 스크롤을 맨 아래로 (reverse 모드에서는 맨 위로)

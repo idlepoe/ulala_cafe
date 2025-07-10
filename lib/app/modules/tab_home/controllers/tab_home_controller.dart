@@ -156,6 +156,43 @@ class TabHomeController extends GetxController {
       .map((ranking) => ranking.toYoutubeTrack())
       .toList();
 
+  // 전체 재생 메서드들
+  void playAllDailyRankings() {
+    if (dailyRankings.isNotEmpty) {
+      try {
+        final miniPlayerController = Get.find<MiniPlayerController>();
+        miniPlayerController.playAllTracks(dailyRankings);
+        logger.d('일일 랭킹 전체 재생 시작: ${dailyRankings.length}개 트랙');
+      } catch (e) {
+        logger.e('일일 랭킹 전체 재생 실패: $e');
+      }
+    }
+  }
+
+  void playAllWeeklyRankings() {
+    if (weeklyRankings.isNotEmpty) {
+      try {
+        final miniPlayerController = Get.find<MiniPlayerController>();
+        miniPlayerController.playAllTracks(weeklyRankings);
+        logger.d('주간 랭킹 전체 재생 시작: ${weeklyRankings.length}개 트랙');
+      } catch (e) {
+        logger.e('주간 랭킹 전체 재생 실패: $e');
+      }
+    }
+  }
+
+  void playAllMonthlyRankings() {
+    if (monthlyRankings.isNotEmpty) {
+      try {
+        final miniPlayerController = Get.find<MiniPlayerController>();
+        miniPlayerController.playAllTracks(monthlyRankings);
+        logger.d('월간 랭킹 전체 재생 시작: ${monthlyRankings.length}개 트랙');
+      } catch (e) {
+        logger.e('월간 랭킹 전체 재생 실패: $e');
+      }
+    }
+  }
+
   @override
   void onReady() {
     super.onReady();

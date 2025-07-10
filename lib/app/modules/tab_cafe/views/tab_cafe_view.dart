@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:intl/intl.dart';
@@ -16,20 +17,26 @@ class TabCafeView extends GetView<TabCafeController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // 상단 헤더 + 카드
-            _buildHeader(),
+    return KeyboardListener(
+      focusNode: FocusNode(),
+      onKeyEvent: (event) {
+        controller.handleKeyboardShortcut(event);
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: SafeArea(
+          child: Column(
+            children: [
+              // 상단 헤더 + 카드
+              _buildHeader(),
 
-            // 채팅 메시지 리스트
-            Expanded(child: _buildMessageList()),
+              // 채팅 메시지 리스트
+              Expanded(child: _buildMessageList()),
 
-            // 하단 메시지 입력창
-            _buildMessageInput(),
-          ],
+              // 하단 메시지 입력창
+              _buildMessageInput(),
+            ],
+          ),
         ),
       ),
     );
@@ -439,7 +446,7 @@ class TabCafeView extends GetView<TabCafeController> {
                 controller: controller.messageController,
                 maxLines: null,
                 decoration: const InputDecoration(
-                  hintText: '메시지를 입력하세요...',
+                  hintText: '메시지를 입력하세요... (Alt+Enter로 전송)',
                   hintStyle: TextStyle(color: AppColors.textSecondary),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(
