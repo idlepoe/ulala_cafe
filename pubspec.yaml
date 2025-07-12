@@ -74,7 +74,7 @@ msix_config:
   publisher_display_name: "이제영"
   identity_name: 8C13C29F.-
   publisher: CN=E6E0CA64-5693-4B23-9A95-DF94678405F8
-  msix_version: 1.0.1.0
+  msix_version: 1.0.2.0
   logo_path: assets/icon/icon-removebg.ico
   architecture: x64
   capabilities: internetClient
