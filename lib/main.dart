@@ -14,6 +14,7 @@ import 'firebase_options.dart';
 import 'app/routes/app_pages.dart';
 import 'app/data/constants/app_colors.dart';
 import 'app/modules/webview/controllers/webview_controller.dart';
+import 'app/data/utils/startup_service.dart';
 
 SimplePip? pip;
 
@@ -49,13 +50,33 @@ void main() async {
 
   runApp(const MyApp());
 
+  // 시작시 실행 상태 동기화 (Windows에서만)
+  if (!kIsWeb && Platform.isWindows) {
+    try {
+      final startupService = StartupService();
+      await startupService.syncStartupState();
+      print('시작시 실행 상태 동기화 완료');
+    } catch (e) {
+      print('시작시 실행 상태 동기화 실패: $e');
+    }
+  }
+
   // tray_manager 초기화 (Windows에서만)
   if (!kIsWeb && Platform.isWindows) {
     try {
+      // 시작시 실행 상태 확인하여 메뉴 설정
+      final startupService = StartupService();
+      final isStartupEnabled = await startupService.isStartupEnabled();
+
       await TrayManager.instance.setContextMenu(
         Menu(
           items: [
             MenuItem(key: 'show', label: '창 열기'),
+            MenuItem.separator(),
+            if (isStartupEnabled)
+              MenuItem(key: 'startup_disable', label: '윈도우 시작시 실행 끄기')
+            else
+              MenuItem(key: 'startup_enable', label: '윈도우 시작시 실행 켜기'),
             MenuItem.separator(),
             MenuItem(key: 'exit', label: '앱 종료'),
           ],
@@ -143,6 +164,49 @@ class MyTrayListener with TrayListener {
     }
   }
 
+  // 시작시 실행 토글
+  Future<void> _toggleStartup(bool enabled) async {
+    try {
+      final startupService = StartupService();
+      final success = await startupService.setStartupEnabled(enabled);
+
+      if (success) {
+        print('시작시 실행 ${enabled ? "활성화" : "비활성화"} 완료');
+        // 메뉴 업데이트
+        await _updateTrayMenu();
+      } else {
+        print('시작시 실행 설정 실패');
+      }
+    } catch (e) {
+      print('시작시 실행 토글 실패: $e');
+    }
+  }
+
+  // 트레이 메뉴 업데이트
+  Future<void> _updateTrayMenu() async {
+    try {
+      final startupService = StartupService();
+      final isStartupEnabled = await startupService.isStartupEnabled();
+
+      await TrayManager.instance.setContextMenu(
+        Menu(
+          items: [
+            MenuItem(key: 'show', label: '창 열기'),
+            MenuItem.separator(),
+            if (isStartupEnabled)
+              MenuItem(key: 'startup_disable', label: '윈도우 시작시 실행 끄기')
+            else
+              MenuItem(key: 'startup_enable', label: '윈도우 시작시 실행 켜기'),
+            MenuItem.separator(),
+            MenuItem(key: 'exit', label: '앱 종료'),
+          ],
+        ),
+      );
+    } catch (e) {
+      print('트레이 메뉴 업데이트 실패: $e');
+    }
+  }
+
   @override
   void onTrayIconRightMouseDown() {
     print('시스템 트레이 우클릭됨');
@@ -158,6 +222,14 @@ class MyTrayListener with TrayListener {
       case 'show':
         print('창 열기 실행');
         await _showAndFocusWindow();
+        break;
+      case 'startup_enable':
+        print('시작시 실행 켜기 실행');
+        await _toggleStartup(true);
+        break;
+      case 'startup_disable':
+        print('시작시 실행 끄기 실행');
+        await _toggleStartup(false);
         break;
       case 'exit':
         print('앱 종료 실행');

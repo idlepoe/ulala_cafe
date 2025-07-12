@@ -217,6 +217,17 @@ class MiniPlayerView extends GetView<MiniPlayerController> {
                               height: 1.3,
                             ),
                           ),
+                          const Padding(
+                            padding: EdgeInsets.only(top: 4),
+                            child: Text(
+                              '💡 윈도우에서는 본문을 한 번 클릭해야 키보드 단축키가 동작합니다.',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: Color(0xFF3182F6),
+                                height: 1.3,
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),

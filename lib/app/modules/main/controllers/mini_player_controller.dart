@@ -9,6 +9,7 @@ import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/material.dart';
 import '../../../data/models/youtube_track_model.dart';
 import '../../../data/providers/ranking_provider.dart';
 
@@ -63,6 +64,38 @@ class MiniPlayerController extends GetxController {
 
   void initializeYoutubeController() {
     youtubeController = YoutubePlayerController();
+
+    // YouTube 플레이어 이벤트 리스너 설정
+    youtubeController.listen((event) {
+      logger.d('YouTube 플레이어 이벤트: ${event.playerState}');
+      _handleYoutubePlayerEvent(event);
+    });
+  }
+
+  void _handleYoutubePlayerEvent(YoutubePlayerValue event) {
+    // 재생 상태 업데이트
+    isPlaying.value = event.playerState == PlayerState.playing;
+
+    // 비디오가 끝났을 때 다음 곡 재생
+    if (event.playerState == PlayerState.ended) {
+      logger.d('비디오 재생 종료 - 다음 곡 재생 시작');
+      _playNextTrack();
+    }
+  }
+
+  void _playNextTrack() {
+    if (playlist.isEmpty) return;
+
+    // 다음 곡이 있으면 다음 곡으로, 없으면 첫 번째 곡으로
+    if (currentIndex.value < playlist.length - 1) {
+      currentIndex.value++;
+    } else {
+      // 마지막 곡이 끝났을 때는 첫 번째 곡으로 돌아가기 (반복 재생)
+      currentIndex.value = 0;
+    }
+
+    final track = playlist[currentIndex.value];
+    _updateCurrentTrack(track);
   }
 
   void playVideo(
